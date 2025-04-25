@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ topic.title }} - Mentally</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- A-Frame for AR visualization -->
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Mentally</h1>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/ar_experience">AR Experience</a></li>
+                    <li><a href="/learn" class="active">Learn</a></li>
+                    <li><a href="/simulations">Simulations</a></li>
+                    <li><a href="/activities">Activities</a></li>
+                    <li><a href="/mental_health_content">Resources</a></li>
+                </ul>
+            </nav>
+            <button class="menu-toggle" title="Toggle Menu">
+                <span class="visually-hidden">Menu</span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <a href="/learn" class="back-link">&larr; Back to Topics</a>
+            <h2>{{ topic.title }}</h2>
+            <p>{{ topic.overview }}</p>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="tab-container">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="overview">Overview</button>
+                    <button class="tab-btn" data-tab="symptoms">Symptoms</button>
+                    <button class="tab-btn" data-tab="treatments">Treatments</button>
+                    <button class="tab-btn" data-tab="ar-visualizations">AR Visualizations</button>
+                    <button class="tab-btn" data-tab="resources">Resources</button>
+                </div>
+                
+                <div id="overview" class="tab-content active">
+                    <h3>Understanding {{ topic.title }}</h3>
+                    <p>{{ topic.overview }}</p>
+                    
+                    {% if topic.infographics %}
+                        <div class="infographics">
+                            <h4>Key Information</h4>
+                            <div class="infographics-grid">
+                                {% for infographic in topic.infographics %}
+                                    <div class="infographic">
+                                        <img src="{{ url_for('static', filename='images/infographics/' + infographic) }}" alt="Infographic about {{ topic.title }}">
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div id="symptoms" class="tab-content">
+                    <h3>Common Symptoms</h3>
+                    <p>The following symptoms are commonly associated with {{ topic.title }}. Remember that symptoms can vary from person to person, and having some of these symptoms doesn't necessarily mean someone has this condition.</p>
+                    
+                    
+                    
+                    <div class="note-box">
+                        <h4>Important Note</h4>
+                        <p>If you or someone you know is experiencing these symptoms, it's important to seek help from a qualified mental health professional for proper diagnosis and treatment.</p>
+                    </div>
+                </div>
+                
+                <div id="treatments" class="tab-content">
+                    <h3>Treatment Approaches</h3>
+                    <p>There are several evidence-based approaches to treating {{ topic.title }}. Treatment plans are typically personalized to each individual's needs.</p>
+                    
+                    <div class="treatment-grid">
+                        {% for treatment in topic.treatments %}
+                            <div class="treatment-card">
+                                <h4>{{ treatment }}</h4>
+                                <p>This is a common treatment approach for {{ topic.title }}.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="note-box">
+                        <h4>Treatment Information</h4>
+                        <p>Treatment effectiveness varies from person to person. Working with healthcare providers to find the right approach is important.</p>
+                    </div>
+                </div>
+                
+                <div id="ar-visualizations" class="tab-content">
+                    <h3>Experience Through AR</h3>
+                    <p>Use augmented reality to better understand aspects of {{ topic.title }}. Point your camera at a flat surface to visualize these concepts.</p>
+                    
+                    <div id="ar-experience-container">
+                        <button id="start-ar-btn" class="btn primary">Start AR Experience</button>
+                        <div id="ar-scene-container" class="hidden"></div>
+                    </div>
+                    <div class="ar-model-selection">
+                        <h4>Select a Model</h4>
+                        <div class="model-buttons">
+                            {% for model in topic.ar_models %}
+                                <button class="ar-model-btn" data-model="{{ model }}">{{ model.replace('.gltf', '').replace('_', ' ').title() }}</button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                
+                <div id="resources" class="tab-content">
+                    <h3>Additional Resources</h3>
+                    <p>Explore these resources to learn more about {{ topic.title }}.</p>
+                    
+                    {% if topic.videos %}
+                        <div class="videos-section">
+                            <h4>Educational Videos</h4>
+                            <div class="videos-grid">
+                                {% for video in topic.videos %}
+                                    <div class="video-card">
+                                        <div class="video-container">
+                                            <img src="{{ url_for('static', filename='images/video_thumbnails/' + video.replace('.mp4', '.jpg')) }}" alt="Video thumbnail">
+                                            <button class="play-btn" data-video="{{ video }}">Play Video</button>
+                                        </div>
+                                        <h5>{{ video.replace('.mp4', '').replace('_', ' ').title() }}</h5>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="helpful-links">
+                        <h4>Helpful Links</h4>
+                        <ul class="resource-links">
+                            <li><a href="/mental_health_content" target="_blank">General Mental Health Information</a></li>
+                            <li><a href="/local_resources" target="_blank">Find Local Support</a></li>
+                            <li><a href="/activities" target="_blank">Interactive Activities</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="related-topics">
+        <div class="container">
+            <h3>Related Topics</h3>
+            <div class="related-grid">
+                <div class="topic-card">
+                    <h4>Coping Strategies</h4>
+                    <p>Explore effective ways to manage symptoms and improve wellbeing.</p>
+                    <a href="/learn/coping-strategies" class="btn secondary">Learn More</a>
+                </div>
+                <div class="topic-card">
+                    <h4>Supporting Others</h4>
+                    <p>How to help someone experiencing mental health challenges.</p>
+                    <a href="/learn/supporting-others" class="btn secondary">Learn More</a>
+                </div>
+                <div class="topic-card">
+                    <h4>Stigma Reduction</h4>
+                    <p>Understanding and challenging mental health stigma.</p>
+                    <a href="/learn/stigma-reduction" class="btn secondary">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Mentally</h3>
+                    <p>Reducing Mental Health Stigma Using Augmented Reality (AR)</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/learn">Learn</a></li>
+                        <li><a href="/simulations">Simulations</a></li>
+                        <li><a href="/activities">Activities</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="/mental_health_content">Information</a></li>
+                        <li><a href="/local_resources">Find Local Support</a></li>
+                        <li><a href="/mindfulness">Mindfulness Exercises</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Mentally Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // AR experience functionality
+            const startARBtn = document.getElementById('start-ar-btn');
+            const arSceneContainer = document.getElementById('ar-scene-container');
+            const arModelBtns = document.querySelectorAll('.ar-model-btn');
+            let currentModel = null;
+            
+            if (startARBtn && arSceneContainer) {
+                startARBtn.addEventListener('click', function() {
+                    this.classList.add('hidden');
+                    arSceneContainer.classList.remove('hidden');
+                    
+                    // Start with first available model if there are any
+                    if (arModelBtns.length > 0) {
+                        const firstModelBtn = arModelBtns[0];
+                        const modelName = firstModelBtn.getAttribute('data-model');
+                        currentModel = modelName;
+                        initializeARScene(modelName);
+                    }
+                });
+            }
+            
+            // AR model selection
+            arModelBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modelName = this.getAttribute('data-model');
+                    currentModel = modelName;
+                    
+                    // Update AR scene if it's already showing
+                    if (!arSceneContainer.classList.contains('hidden')) {
+                        initializeARScene(modelName);
+                    }
+                    
+                    // Update active state of buttons
+                    arModelBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            function initializeARScene(modelName) {
+                try {
+                    // Clear previous scene
+                    arSceneContainer.innerHTML = '';
+                    
+                    // Create A-Frame scene
+                    const scene = document.createElement('a-scene');
+                    scene.setAttribute('embedded', '');
+                    scene.setAttribute('arjs', 'sourceType: webcam; debugUIEnabled: false;');
+                    
+                    // Create marker
+                    const marker = document.createElement('a-marker');
+                    marker.setAttribute('preset', 'hiro');
+                    
+                    // Add 3D model
+                    const model = document.createElement('a-entity');
+                    model.setAttribute('gltf-model', `../static/models/${modelName}`);
+                    model.setAttribute('scale', '0.5 0.5 0.5');
+                    model.setAttribute('position', '0 0 0');
+                    model.setAttribute('rotation', '0 0 0');
+                    
+                    // Add camera
+                    const camera = document.createElement('a-entity');
+                    camera.setAttribute('camera', '');
+                    
+                    // Assemble the scene
+                    marker.appendChild(model);
+                    scene.appendChild(marker);
+                    scene.appendChild(camera);
+                    
+                    // Add scene to container
+                    arSceneContainer.appendChild(scene);
+                    
+                    // Add instructions
+                    const instructions = document.createElement('div');
+                    instructions.className = 'ar-instructions';
+                    instructions.innerHTML = `
+                        <p>Point your camera at a Hiro marker to see this visualization.</p>
+                        <div class="marker-container">
+                            <img src="../static/images/markers/hiro-marker.png" alt="Hiro Marker" class="hiro-marker-img">
+                            <a href="../static/images/markers/hiro-marker.png" download="hiro-marker.png" class="marker-download">
+                                Download Marker
+                            </a>
+                        </div>
+                    `;
+                    arSceneContainer.appendChild(instructions);
+                    
+                    // Add exit button
+                    const exitBtn = document.createElement('button');
+                    exitBtn.innerText = 'Exit AR';
+                    exitBtn.className = 'exit-ar-btn btn secondary';
+                    arSceneContainer.appendChild(exitBtn);
+                    
+                    exitBtn.addEventListener('click', function() {
+                        arSceneContainer.classList.add('hidden');
+                        startARBtn.classList.remove('hidden');
+                    });
+                } catch (error) {
+                    console.error('Error initializing AR scene:', error);
+                    arSceneContainer.innerHTML = '<div class="error">Error loading AR experience. Your device may not support AR features.</div>';
+                }
+            }
+            
+            // Video playback functionality
+            const playButtons = document.querySelectorAll('.play-btn');
+            
+            playButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const videoName = this.getAttribute('data-video');
+                    
+                    // Create modal for video playback
+                    const videoModal = document.createElement('div');
+                    videoModal.className = 'video-modal';
+                    
+                    videoModal.innerHTML = `
+                        <div class="video-modal-content">
+                            <button class="close-modal">&times;</button>
+                            <video controls>
+                                <source src="${videoName}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(videoModal);
+                    
+                    // Handle close button
+                    const closeBtn = videoModal.querySelector('.close-modal');
+                    closeBtn.addEventListener('click', function() {
+                        videoModal.remove();
+                    });
+                    
+                    // Close on outside click
+                    videoModal.addEventListener('click', function(event) {
+                        if (event.target === videoModal) {
+                            videoModal.remove();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

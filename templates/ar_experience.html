@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Experience - Mentally</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ar-experience.css') }}">
+    <!-- A-Frame for AR -->
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <!-- AR.js for marker-based AR -->
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <!-- Animation library -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+<body>
+    <div class="animated-background">
+        <div class="wave wave1"></div>
+        <div class="wave wave2"></div>
+    </div>
+
+    <header>
+        <div class="container">
+            <h1 class="logo">Mentally</h1>
+            <p class="tagline">Reducing Mental Health Stigma Using Augmented Reality (AR)</p>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/ar_experience" class="active">AR Experience</a></li>
+                    <li><a href="/learn">Learn</a></li>
+                    <li><a href="/simulations">Simulations</a></li>
+                    <li><a href="/activities">Activities</a></li>
+                    <li><a href="/mental_health_content">Resources</a></li>
+                </ul>
+            </nav>
+            <button class="menu-toggle" title="Toggle Menu">
+                <span class="visually-hidden">Menu</span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <section class="ar-header" data-aos="fade-up">
+        <div class="container">
+            <h2>Augmented Reality Experience</h2>
+            <p>Explore mental health concepts through interactive AR visualizations to gain new perspectives and reduce stigma.</p>
+        </div>
+    </section>
+
+    <section class="ar-interface">
+        <div class="container">
+            <div class="experience-content" id="ar-experience-content" data-aos="fade-up" data-aos-delay="100">
+                <div class="ar-prompt" data-aos="fade-up" data-aos-delay="200">
+                    <h3>What mental health topic would you like to explore?</h3>
+                    <p>Enter a term like "anxiety", "depression", "stigma", or "stereotypes"</p>
+                    
+                    <div class="input-container">
+                        <div class="input-group">
+                            <input type="text" id="user-prompt" placeholder="Enter a mental health topic...">
+                            <button id="ar-submit" class="btn primary">Explore in AR</button>
+                        </div>
+                        
+                        <div class="input-icon pulse-dot"></div>
+                    </div>
+                    
+                    <div class="ar-suggestions">
+                        <h4>Suggested experiences:</h4>
+                        <div class="suggestion-buttons">
+                            <button type="button" class="btn mini primary" data-topic="anxiety stigma">Anxiety Stigma</button>
+                            <button type="button" class="btn mini primary" data-topic="depression reality">Depression Reality</button>
+                            <button type="button" class="btn mini primary" data-topic="breaking stereotypes">Breaking Stereotypes</button>
+                            <button type="button" class="btn mini primary" data-topic="mental health awareness">Mental Health Awareness</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="featured-experiences">
+                    <h3>Guided Experiences</h3>
+                    <p>Try our carefully designed AR journeys to explore mental health concepts</p>
+                    
+                    <div class="tours-grid">
+                        <div class="tour-card">
+                            <div class="tour-preview">
+                                <img src="{{ url_for('static', filename='images/anxiety_tour_preview.jpg') }}" alt="Anxiety Understanding Tour">
+                                <span class="tour-duration">5 minutes</span>
+                            </div>
+                            <div class="tour-content">
+                                <h4>Understanding Anxiety</h4>
+                                <p>Visualize how anxiety affects the mind and body through interactive AR models.</p>
+                                <button type="button" class="btn secondary start-tour" data-tour="anxiety visualization">Start Experience</button>
+                            </div>
+                        </div>
+                        
+                        <div class="tour-card">
+                            <div class="tour-preview">
+                                <img src="{{ url_for('static', filename='images/stigma_tour_preview.jpg') }}" alt="Breaking Stigma Tour">
+                                <span class="tour-duration">7 minutes</span>
+                            </div>
+                            <div class="tour-content">
+                                <h4>Breaking the Stigma</h4>
+                                <p>Experience how stigma forms and can be broken through powerful AR visualizations.</p>
+                                <button type="button" class="btn secondary start-tour" data-tour="breaking stereotypes">Start Experience</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Support Network Tour card removed -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="ar-content" class="ar-viewer hidden">
+                <!-- AR content will be inserted here by JavaScript -->
+                <button id="stop-ar" class="btn stop-ar-btn" aria-label="Stop AR experience">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                    <span>Exit AR</span>
+                </button>
+            </div>
+
+            <div id="ar-info-overlay" class="info-overlay hidden">
+                <div class="info-content">
+                    <button id="close-info" class="close-btn" aria-label="Close information panel">✕</button>
+                    <h3 id="ar-title">Title</h3>
+                    <p id="ar-description">Description</p>
+                    <div class="fact-box">
+                        <h4>Did You Know?</h4>
+                        <p id="ar-fact">Fact</p>
+                    </div>
+                    
+                    <div class="reflection-field">
+                        <h4>Personal Reflection</h4>
+                        <p>How does this change your perspective about mental health?</p>
+                        <textarea id="reflection-input" rows="3" placeholder="Type your thoughts here..."></textarea>
+                        <button type="button" id="save-reflection" class="btn secondary">Save Reflection</button>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button type="button" id="share-experience" class="btn secondary">Share Experience</button>
+                        <button type="button" id="continue-exploring" class="btn primary">Continue Exploring</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="ar-tips" data-aos="fade-up">
+        <div class="container">
+            <h3>Tips for the Best AR Experience</h3>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z"/>
+                        </svg>
+                    </div>
+                    <h4>Well-Lit Environment</h4>
+                    <p>Use AR in a well-lit area for better tracking and visibility.</p>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.66 7.93L12 2.27 6.34 7.93c-3.12 3.12-3.12 8.19 0 11.31C7.9 20.8 9.95 21.58 12 21.58c2.05 0 4.1-.78 5.66-2.34 3.12-3.12 3.12-8.19 0-11.31zM12 19.59c-1.6 0-3.11-.62-4.24-1.76C6.62 16.69 6 15.19 6 13.59s.62-3.11 1.76-4.24L12 5.1v14.49z"/>
+                        </svg>
+                    </div>
+                    <h4>Stable Surface</h4>
+                    <p>Point your camera at a flat, stable surface with some texture for better tracking.</p>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm7-7H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-1.75 9c0 .23-.02.46-.05.68l1.48 1.16c.13.11.17.3.08.45l-1.4 2.42c-.09.15-.27.21-.43.15l-1.74-.7c-.36.28-.76.51-1.18.69l-.26 1.85c-.03.17-.18.3-.35.3h-2.8c-.17 0-.32-.13-.35-.29l-.26-1.85c-.43-.18-.82-.41-1.18-.69l-1.74.7c-.16.06-.34 0-.43-.15l-1.4-2.42c-.09-.15-.05-.34.08-.45l1.48-1.16c-.03-.23-.05-.46-.05-.69s.02-.46.05-.68l-1.48-1.16c-.13-.11-.17-.3-.08-.45l1.4-2.42c.09-.15.27-.21.43-.15l1.74.7c.36-.28.76-.51 1.18-.69l.26-1.85c.03-.17.18-.3.35-.3h2.8c.17 0 .32.13.35.29l.26 1.85c.43.18.82.41 1.18.69l1.74-.7c.16.06.34 0 .43.15l1.4 2.42c.09.15.05.34-.08.45l-1.48 1.16c.03.23.05.46.05.69z"/>
+                        </svg>
+                    </div>
+                    <h4>Privacy</h4>
+                    <p>Your camera is only used for AR visualization and no images are stored or shared.</p>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 15c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm9-9.5V9c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5.5C3 4.67 3.67 4 4.5 4H7V2h10v2h2.5c.83 0 1.5.67 1.5 1.5z"/>
+                        </svg>
+                    </div>
+                    <h4>Device Settings</h4>
+                    <p>Make sure your device allows camera access and has AR capabilities.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="feedback-section glass-effect" data-aos="fade-up">
+        <div class="container">
+            <h3>How did this AR experience affect you?</h3>
+            <p>Your feedback helps us improve our stigma-reducing AR experiences.</p>
+            
+            <div class="feedback-options">
+                <button type="button" class="feedback-btn" data-feedback="enlightening">
+                    <span class="feedback-icon">💡</span>
+                    <span>Enlightening</span>
+                </button>
+                <button type="button" class="feedback-btn" data-feedback="emotional">
+                    <span class="feedback-icon">❤️</span>
+                    <span>Emotional</span>
+                </button>
+                <button type="button" class="feedback-btn" data-feedback="educational">
+                    <span class="feedback-icon">📚</span>
+                    <span>Educational</span>
+                </button>
+                <button type="button" class="feedback-btn" data-feedback="perspective-changing">
+                    <span class="feedback-icon">🔄</span>
+                    <span>Changed My Perspective</span>
+                </button>
+            </div>
+            
+            <div class="feedback-form hidden" id="detailed-feedback">
+                <textarea placeholder="Tell us more about your experience..." rows="4"></textarea>
+                <button type="button" class="btn primary submit-feedback">Submit Feedback</button>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Mentally</h3>
+                    <p>Reducing Mental Health Stigma Using Augmented Reality (AR)</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/learn">Learn</a></li>
+                        <li><a href="/simulations">Simulations</a></li>
+                        <li><a href="/activities">Activities</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="/mental_health_content">Information</a></li>
+                        <li><a href="/local_resources">Find Local Support</a></li>
+                        <li><a href="/mindfulness">Mindfulness Exercises</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Mentally Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ar-experience.js') }}"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        // Initialize AOS animations
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        // Hero section parallax effect
+        document.addEventListener('mousemove', function(e) {
+            // ...existing code...
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Guided tour functionality
+            const tourButtons = document.querySelectorAll('.start-tour');
+            tourButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const tour = this.getAttribute('data-tour');
+                    document.getElementById('user-prompt').value = tour;
+                    document.getElementById('ar-submit').click();
+                });
+            });
+            
+            // Feedback button functionality
+            const feedbackBtns = document.querySelectorAll('.feedback-btn');
+            const detailedFeedback = document.getElementById('detailed-feedback');
+            
+            feedbackBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Toggle active state on buttons
+                    if (this.classList.contains('active')) {
+                        this.classList.remove('active');
+                    } else {
+                        feedbackBtns.forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                    }
+                    
+                    // Show detailed feedback form if any button is active
+                    const anyActive = document.querySelector('.feedback-btn.active');
+                    detailedFeedback.classList.toggle('hidden', !anyActive);
+                });
+            });
+            
+            // Submit feedback
+            document.querySelector('.submit-feedback')?.addEventListener('click', function() {
+                const activeFeedback = document.querySelector('.feedback-btn.active');
+                const feedbackType = activeFeedback ? activeFeedback.getAttribute('data-feedback') : '';
+                const feedbackText = document.querySelector('#detailed-feedback textarea').value;
+                
+                // In a real implementation, send this to the server
+                console.log('Feedback type:', feedbackType);
+                console.log('Feedback text:', feedbackText);
+                
+                // Show thank you message
+                detailedFeedback.innerHTML = '<p class="thank-you">Thank you for your feedback!</p>';
+                
+                // Reset after delay
+                setTimeout(() => {
+                    feedbackBtns.forEach(b => b.classList.remove('active'));
+                    detailedFeedback.classList.add('hidden');
+                    detailedFeedback.innerHTML = `
+                        <textarea placeholder="Tell us more about your experience..." rows="4"></textarea>
+                        <button type="button" class="btn primary submit-feedback">Submit Feedback</button>
+                    `;
+                }, 3000);
+            });
+
+            // Check for camera permissions
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .catch(function(err) {
+                        console.error('Camera access error:', err);
+                        alert('Please allow camera access to use the AR features.');
+                    });
+            }
+        });
+    </script>
+</body>
+</html>

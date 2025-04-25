@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stigma Busters AR Scavenger Hunt - Mentally</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- A-Frame for AR -->
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <!-- AR.js for marker-based AR -->
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <!-- QR Code scanner -->
+    <script src="https://unpkg.com/html5-qrcode/html5-qrcode.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Mentally</h1>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/ar_experience">AR Experience</a></li>
+                    <li><a href="/learn">Learn</a></li>
+                    <li><a href="/simulations">Simulations</a></li>
+                    <li><a href="/activities" class="active">Activities</a></li>
+                    <li><a href="/mental_health_content">Resources</a></li>
+                </ul>
+            </nav>
+            <button class="menu-toggle" title="Toggle Menu">
+                <span class="visually-hidden">Menu</span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <a href="/activities" class="back-link">&larr; Back to Activities</a>
+            <h2>{{ hunt.title }}</h2>
+            <p>{{ hunt.description }}</p>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="container">
+            <div id="hunt-intro" class="hunt-section">
+                <h3>How It Works</h3>
+                <div class="instruction-box">
+                    <p>{{ hunt.instructions }}</p>
+                    
+                    <div class="steps-container">
+                        <ol class="steps">
+                            <li>Read the clues below to find each location</li>
+                            <li>Scan the AR markers using your device's camera</li>
+                            <li>Complete the task shown in each AR experience</li>
+                            <li>Check off each clue as you complete it</li>
+                            <li>Earn your Stigma Buster badge when you complete all locations!</li>
+                        </ol>
+                    </div>
+                    
+                    <button id="start-hunt-btn" class="btn primary">Start Hunt</button>
+                </div>
+            </div>
+
+            <div id="hunt-progress" class="hunt-section hidden">
+                <h3>Your Progress</h3>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                    <p class="progress-text"><span id="locations-found">0</span> of {{ hunt.locations|length }} locations found</p>
+                </div>
+
+                <div class="clues-container">
+                    {% for location in hunt.locations %}
+                    <div class="clue-card" data-location-id="{{ location.id }}">
+                        <div class="clue-header">
+                            <h4>Clue #{{ loop.index }}</h4>
+                            <div class="status-indicator incomplete">
+                                <span class="visually-hidden">Incomplete</span>
+                            </div>
+                        </div>
+                        <p>{{ location.clue }}</p>
+                        <div class="clue-actions">
+                            <button class="btn secondary scan-marker-btn" data-location-id="{{ location.id }}">Scan Marker</button>
+                            <button class="btn secondary hint-btn" data-location-id="{{ location.id }}">Get Hint</button>
+                        </div>
+                        <div class="hint-box hidden">
+                            <p><strong>Hint:</strong> For testing purposes, you can <a href="{{ url_for('static', filename='images/markers/' + location.ar_marker) }}" target="_blank">open the marker here</a> and scan it with your device.</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div id="scanner-container" class="hidden">
+                <div class="scanner-header">
+                    <h3>Scan AR Marker</h3>
+                    <button id="close-scanner-btn" class="btn-icon">✕</button>
+                </div>
+                <div id="qr-reader"></div>
+                <p class="scanner-tip">Point your camera at the AR marker to reveal the content.</p>
+            </div>
+
+            <div id="ar-viewer" class="ar-viewer hidden">
+                <!-- AR content will be inserted here -->
+                <button id="close-ar-btn" class="ar-close-btn">✕</button>
+                <button id="complete-task-btn" class="btn primary ar-end-btn">Mark Task Complete</button>
+            </div>
+
+            <div id="completion-reward" class="reward-section hidden">
+                <h3>Congratulations!</h3>
+                <p>{{ hunt.completion_reward.description }}</p>
+                
+                <div class="reward-display">
+                    <div id="ar-badge-container"></div>
+                </div>
+                
+                <div class="sharing-options">
+                    <h4>Share Your Achievement</h4>
+                    <div class="social-buttons">
+                        <button class="share-btn instagram">Instagram</button>
+                        <button class="share-btn facebook">Facebook</button>
+                        <button class="share-btn twitter">Twitter</button>
+                    </div>
+                </div>
+                
+                <button id="download-badge-btn" class="btn secondary">Download Badge</button>
+                <a href="/activities" class="btn primary">More Activities</a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Parse hunt data safely
+            let huntData;
+            try {
+                huntData = JSON.parse('{{ hunt|tojson|safe }}');
+            } catch (error) {
+                console.error('Error parsing hunt data:', error);
+                alert('Error loading scavenger hunt data');
+                return;
+            }
+            
+            const startHuntBtn = document.getElementById('start-hunt-btn');
+            const huntIntro = document.getElementById('hunt-intro');
+            const huntProgress = document.getElementById('hunt-progress');
+            const scannerContainer = document.getElementById('scanner-container');
+            const closeScanner = document.getElementById('close-scanner-btn');
+            const arViewer = document.getElementById('ar-viewer');
+            const closeArBtn = document.getElementById('close-ar-btn');
+            const completeTaskBtn = document.getElementById('complete-task-btn');
+            const completionReward = document.getElementById('completion-reward');
+            
+            let html5QrScanner;
+            let activeLocationId;
+            let completedLocations = [];
+            
+            // Start hunt button click
+            startHuntBtn.addEventListener('click', function() {
+                huntIntro.classList.add('hidden');
+                huntProgress.classList.remove('hidden');
+            });
+            
+            // Initialize scanner buttons
+            document.querySelectorAll('.scan-marker-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    activeLocationId = this.dataset.locationId;
+                    initializeScanner();
+                    scannerContainer.classList.remove('hidden');
+                });
+            });
+            
+            // Initialize hint buttons
+            document.querySelectorAll('.hint-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const locationId = this.dataset.locationId;
+                    const hintBox = this.closest('.clue-card').querySelector('.hint-box');
+                    hintBox.classList.toggle('hidden');
+                });
+            });
+            
+            // Close scanner button
+            closeScanner.addEventListener('click', function() {
+                scannerContainer.classList.add('hidden');
+                stopScanner();
+            });
+            
+            // Close AR viewer button
+            closeArBtn.addEventListener('click', function() {
+                arViewer.classList.add('hidden');
+                arViewer.innerHTML = '';
+                arViewer.appendChild(closeArBtn);
+                arViewer.appendChild(completeTaskBtn);
+            });
+            
+            // Complete task button
+            completeTaskBtn.addEventListener('click', function() {
+                if (activeLocationId) {
+                    markLocationComplete(activeLocationId);
+                    arViewer.classList.add('hidden');
+                }
+            });
+            
+            // Download badge button
+            document.getElementById('download-badge-btn')?.addEventListener('click', function() {
+                alert('Badge downloaded successfully!');
+            });
+            
+            // Social sharing buttons
+            document.querySelectorAll('.share-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    alert(`Sharing to ${this.textContent} (In a real app, this would open a sharing dialog)`);
+                });
+            });
+            
+            // Initialize QR/marker scanner
+            function initializeScanner() {
+                if (html5QrScanner) {
+                    html5QrScanner.resume();
+                    return;
+                }
+                
+                const qrContainer = document.getElementById('qr-reader');
+                
+                html5QrScanner = new Html5Qrcode("qr-reader");
+                
+                const config = {
+                    fps: 10,
+                    qrbox: 250
+                };
+                
+                html5QrScanner.start(
+                    { facingMode: "environment" },
+                    config,
+                    onScanSuccess,
+                    onScanFailure
+                );
+            }
+            
+            function stopScanner() {
+                if (html5QrScanner && html5QrScanner.isScanning) {
+                    html5QrScanner.stop().catch(err => console.error('Error stopping scanner:', err));
+                }
+            }
+            
+            function onScanSuccess(decodedText, decodedResult) {
+                // For demo purposes, consider any scan successful
+                stopScanner();
+                scannerContainer.classList.add('hidden');
+                
+                // Find the corresponding location data
+                const location = huntData.locations.find(loc => loc.id === activeLocationId);
+                
+                if (location) {
+                    showARExperience(location);
+                }
+            }
+            
+            function onScanFailure(error) {
+                // Handle scan failure silently - this function is called frequently when no code is detected
+                console.log('Scan failure:', error);
+            }
+            
+            function showARExperience(location) {
+                arViewer.classList.remove('hidden');
+                
+                try {
+                    // Create A-Frame scene
+                    const scene = document.createElement('a-scene');
+                    scene.setAttribute('embedded', '');
+                    scene.setAttribute('arjs', 'sourceType: webcam; debugUIEnabled: false;');
+                    scene.style.zIndex = '5';
+                    
+                    // Create marker
+                    const marker = document.createElement('a-marker');
+                    marker.setAttribute('preset', 'hiro');
+                    
+                    // Add 3D model based on location
+                    const model = document.createElement('a-entity');
+                    model.setAttribute('gltf-model', `../static/models/${location.ar_content.model}`);
+                    model.setAttribute('scale', '0.5 0.5 0.5');
+                    model.setAttribute('position', '0 0 0');
+                    model.setAttribute('rotation', '0 0 0');
+                    
+                    // Add text for fact
+                    const factText = document.createElement('a-text');
+                    factText.setAttribute('value', location.ar_content.fact);
+                    factText.setAttribute('position', '0 1 0');
+                    factText.setAttribute('align', 'center');
+                    factText.setAttribute('color', '#ffffff');
+                    factText.setAttribute('width', '2');
+                    
+                    // Add text for task
+                    const taskText = document.createElement('a-text');
+                    taskText.setAttribute('value', `Task: ${location.ar_content.task}`);
+                    taskText.setAttribute('position', '0 0.7 0');
+                    taskText.setAttribute('align', 'center');
+                    taskText.setAttribute('color', '#ffff00');
+                    taskText.setAttribute('width', '1.5');
+                    
+                    // Add camera
+                    const camera = document.createElement('a-entity');
+                    camera.setAttribute('camera', '');
+                    
+                    // Assemble the scene
+                    marker.appendChild(model);
+                    marker.appendChild(factText);
+                    marker.appendChild(taskText);
+                    scene.appendChild(marker);
+                    scene.appendChild(camera);
+                    
+                    // Add scene to container (before the buttons)
+                    arViewer.innerHTML = '';
+                    arViewer.appendChild(scene);
+                    arViewer.appendChild(closeArBtn);
+                    arViewer.appendChild(completeTaskBtn);
+                    
+                } catch (error) {
+                    console.error('Error creating AR scene:', error);
+                    arViewer.innerHTML = '<div class="error">Error loading AR experience. Your device may not support AR features.</div>';
+                }
+            }
+            
+            function markLocationComplete(locationId) {
+                if (!completedLocations.includes(locationId)) {
+                    completedLocations.push(locationId);
+                    
+                    // Update UI
+                    const clueCard = document.querySelector(`.clue-card[data-location-id="${locationId}"]`);
+                    if (clueCard) {
+                        const statusIndicator = clueCard.querySelector('.status-indicator');
+                        statusIndicator.classList.remove('incomplete');
+                        statusIndicator.classList.add('complete');
+                        statusIndicator.querySelector('.visually-hidden').textContent = 'Complete';
+                        
+                        // Disable scan button
+                        const scanButton = clueCard.querySelector('.scan-marker-btn');
+                        scanButton.disabled = true;
+                        scanButton.textContent = 'Completed';
+                    }
+                    
+                    // Update progress
+                    const progressFill = document.getElementById('progress-fill');
+                    const locationsFound = document.getElementById('locations-found');
+                    const progress = Math.round((completedLocations.length / huntData.locations.length) * 100);
+                    
+                    progressFill.style.width = `${progress}%`;
+                    locationsFound.textContent = completedLocations.length;
+                    
+                    // Check if all locations are found
+                    if (completedLocations.length === huntData.locations.length) {
+                        setTimeout(showCompletionReward, 1000);
+                    }
+                }
+            }
+            
+            function showCompletionReward() {
+                huntProgress.classList.add('hidden');
+                completionReward.classList.remove('hidden');
+                
+                // Create AR badge view
+                const badgeContainer = document.getElementById('ar-badge-container');
+                
+                try {
+                    // Create embedded AR scene for badge
+                    const scene = document.createElement('a-scene');
+                    scene.setAttribute('embedded', '');
+                    scene.setAttribute('vr-mode-ui', 'enabled: false');
+                    scene.style.height = '300px';
+                    
+                    // Add badge model
+                    const entity = document.createElement('a-entity');
+                    entity.setAttribute('gltf-model', `../static/models/${huntData.completion_reward.ar_model}`);
+                    entity.setAttribute('scale', '0.5 0.5 0.5');
+                    entity.setAttribute('position', '0 0 -2');
+                    entity.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear');
+                    
+                    // Add camera and light
+                    const camera = document.createElement('a-entity');
+                    camera.setAttribute('camera', '');
+                    camera.setAttribute('position', '0 0 0');
+                    
+                    const light = document.createElement('a-entity');
+                    light.setAttribute('light', 'type: ambient; intensity: 1.2');
+                    
+                    // Assemble scene
+                    scene.appendChild(entity);
+                    scene.appendChild(camera);
+                    scene.appendChild(light);
+                    
+                    badgeContainer.appendChild(scene);
+                    
+                } catch (error) {
+                    console.error('Error creating badge AR scene:', error);
+                    badgeContainer.innerHTML = `
+                        <div class="badge-fallback">
+                            <img src="../static/images/badge_placeholder.png" alt="Stigma Buster Badge">
+                            <p>AR Badge View not available on your device</p>
+                        </div>
+                    `;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

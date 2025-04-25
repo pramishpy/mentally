@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ activity.title }} - Mentally</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- A-Frame for AR if needed -->
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <!-- AR.js for marker-based AR -->
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Mentally</h1>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/ar_experience">AR Experience</a></li>
+                    <li><a href="/learn">Learn</a></li>
+                    <li><a href="/simulations">Simulations</a></li>
+                    <li><a href="/activities" class="active">Activities</a></li>
+                    <li><a href="/mental_health_content">Resources</a></li>
+                </ul>
+            </nav>
+            <button class="menu-toggle" aria-label="Toggle navigation menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <a href="/activities" class="back-link">&larr; Back to Activities</a>
+            <h2>{{ activity.title }}</h2>
+            <p>{{ activity.description }}</p>
+            <div class="activity-meta">
+                <span class="duration-badge">{{ activity.duration }}</span>
+                <span class="type-badge">{{ activity.type|title }}</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="container">
+            {% if activity.type == 'quiz' %}
+                <!-- Quiz Activity Template -->
+                <div class="quiz-container">
+                    <div class="progress-container">
+                        <div class="progress-bar" id="quiz-progress"></div>
+                    </div>
+                    
+                    <div id="question-container">
+                        {% for question in activity.questions %}
+                            <div class="question" id="question-{{ loop.index }}" {% if not loop.first %}style="display: none;"{% endif %}>
+                                <h3>Question {{ loop.index }} of {{ activity.questions|length }}</h3>
+                                <p class="question-text">{{ question.question }}</p>
+                                
+                                <div class="options">
+                                    {% for option in question.options %}
+                                        <button class="option-btn" data-correct="{{ question.correct }}" data-option="{{ option }}">{{ option }}</button>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="feedback hidden">
+                                    <div class="feedback-content">
+                                        <h4 class="feedback-heading"></h4>
+                                        <p class="explanation">{{ question.explanation }}</p>
+                                        <button class="btn primary next-btn">Next Question</button>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div id="quiz-results" class="hidden">
+                        <h3>Congratulations!</h3>
+                        <p class="results-message">You've completed the {{ activity.title }}!</p>
+                        <p class="completion-message">{{ activity.completion_message }}</p>
+                        
+                        <div class="score-container">
+                            <div class="score" id="final-score">0%</div>
+                            <p>Correct answers</p>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button id="retry-btn" class="btn secondary">Try Again</button>
+                            <a href="/activities" class="btn primary">More Activities</a>
+                        </div>
+                    </div>
+                </div>
+                
+            {% elif activity.type == 'ar-sharing' %}
+                <!-- AR Sharing Activity Template -->
+                <div class="ar-sharing-container">
+                    <h3>Create Your AR Conversation Starter</h3>
+                    <p>Place virtual objects in your environment to spark conversations about mental health.</p>
+                    
+                    <div class="objects-selection">
+                        <h4>Choose an Object</h4>
+                        <div class="objects-grid">
+                            {% for obj in activity.ar_objects %}
+                                <div class="object-card" data-object-id="{{ obj.id }}">
+                                    <div class="object-preview">
+                                        <img src="{{ url_for('static', filename='images/ar_objects/' + obj.id + '.png') }}" alt="{{ obj.name }}">
+                                    </div>
+                                    <h5>{{ obj.name }}</h5>
+                                    {% if obj.customizable %}
+                                        <div class="message-field">
+                                            <label for="message-{{ obj.id }}">Your message:</label>
+                                            <input type="text" id="message-{{ obj.id }}" placeholder="{{ obj.default_message }}" maxlength="100">
+                                        </div>
+                                    {% else %}
+                                        <p class="object-message">{{ obj.message }}</p>
+                                    {% endif %}
+                                    <button class="btn secondary select-object" data-object-id="{{ obj.id }}">Select</button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div id="ar-experience" class="hidden">
+                        <div id="ar-scene-container"></div>
+                        
+                        <div class="ar-controls">
+                            <button id="capture-btn" class="btn primary">Capture Image</button>
+                            <button id="change-object-btn" class="btn secondary">Change Object</button>
+                        </div>
+                    </div>
+                    
+                    <div id="sharing-options" class="hidden">
+                        <h3>Share Your Creation</h3>
+                        <div class="captured-image">
+                            <img id="captured-preview" src="" alt="Your AR creation">
+                        </div>
+                        
+                        <div class="share-buttons">
+                            <h4>Share on:</h4>
+                            <div class="social-buttons">
+                                {% for platform in activity.sharing_platforms %}
+                                    <button class="share-btn {{ platform|lower }}">{{ platform }}</button>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="hashtags">
+                                <h4>Suggested Hashtags:</h4>
+                                <div class="hashtag-container">
+                                    {% for hashtag in activity.hashtags %}
+                                        <span class="hashtag">{{ hashtag }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <button id="download-btn" class="btn primary">Download Image</button>
+                            <button id="new-creation-btn" class="btn secondary">Create Another</button>
+                        </div>
+                    </div>
+                </div>
+                
+            {% elif activity.type == 'interactive-scenarios' %}
+                <!-- Interactive Scenarios Activity Template -->
+                <div class="scenarios-container">
+                    <div class="scenario-selection">
+                        <h3>Choose a Scenario</h3>
+                        <div class="scenarios-grid">
+                            {% for scenario in activity.scenarios %}
+                                <div class="scenario-card" data-scenario-id="{{ scenario.id }}">
+                                    <h4>{{ scenario.title }}</h4>
+                                    <p>{{ scenario.description }}</p>
+                                    <button class="btn primary start-scenario" data-scenario-id="{{ scenario.id }}">Start Scenario</button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div id="scenario-experience" class="hidden">
+                        <div class="scenario-container" id="active-scenario"></div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="related-section">
+        <div class="container">
+            <h3>More Ways to Fight Stigma</h3>
+            <div class="related-activities">
+                <div class="related-card">
+                    <h4>AR Scavenger Hunt</h4>
+                    <p>Explore your environment while learning about mental health through interactive AR clues.</p>
+                    <a href="/scavenger_hunt" class="btn secondary">Start Hunt</a>
+                </div>
+                <div class="related-card">
+                    <h4>Personal Stories</h4>
+                    <p>Explore interactive AR stories from people who have experienced mental health challenges.</p>
+                    <a href="/stories" class="btn secondary">Explore Stories</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Mentally</h3>
+                    <p>Reducing Mental Health Stigma Using Augmented Reality (AR)</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/learn">Learn</a></li>
+                        <li><a href="/simulations">Simulations</a></li>
+                        <li><a href="/activities">Activities</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="/mental_health_content">Information</a></li>
+                        <li><a href="/local_resources">Find Local Support</a></li>
+                        <li><a href="/mindfulness">Mindfulness Exercises</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Mentally Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Activity-specific JavaScript initialization
+            
+            const activityType = "{{ activity.type }}";
+            if (activityType === 'quiz') {
+                // Quiz functionality
+                initQuiz();
+            } else if (activityType === 'ar-sharing') {
+                // AR sharing functionality
+                initARSharing();
+            } else if (activityType === 'interactive-scenarios') {
+                // Interactive scenarios functionality
+                initScenarios();
+            }
+            
+            function initQuiz() {
+                let currentQuestion = 1;
+                const totalQuestions = parseInt("{{ activity.questions|length }}");
+                let correctAnswers = 0;
+                
+                // Event delegation for option buttons
+                document.querySelector('.quiz-container').addEventListener('click', function(e) {
+                    if (e.target.classList.contains('option-btn')) {
+                        const selectedOption = e.target.dataset.option;
+                        const correctOption = e.target.dataset.correct;
+                        const feedbackDiv = e.target.closest('.question').querySelector('.feedback');
+                        const feedbackHeading = feedbackDiv.querySelector('.feedback-heading');
+                        
+                        // Disable all option buttons in this question
+                        const allOptions = e.target.closest('.options').querySelectorAll('.option-btn');
+                        allOptions.forEach(btn => btn.disabled = true);
+                        
+                        // Check if answer is correct
+                        if (selectedOption === correctOption) {
+                            e.target.classList.add('correct');
+                            feedbackHeading.textContent = 'Correct!';
+                            correctAnswers++;
+                        } else {
+                            e.target.classList.add('incorrect');
+                            feedbackHeading.textContent = 'Not quite right';
+                            
+                            // Highlight correct answer
+                            allOptions.forEach(btn => {
+                                if (btn.dataset.option === correctOption) {
+                                    btn.classList.add('correct');
+                                }
+                            });
+                        }
+                        
+                        // Show feedback
+                        feedbackDiv.classList.remove('hidden');
+                    }
+                    
+                    if (e.target.classList.contains('next-btn')) {
+                        // Move to next question or show results
+                        const currentQuestionDiv = document.getElementById(`question-${currentQuestion}`);
+                        currentQuestionDiv.style.display = 'none';
+                        
+                        if (currentQuestion < totalQuestions) {
+                            currentQuestion++;
+                            document.getElementById(`question-${currentQuestion}`).style.display = 'block';
+                            
+                            // Update progress bar
+                            const progress = ((currentQuestion - 1) / totalQuestions) * 100;
+                            document.getElementById('quiz-progress').style.width = `${progress}%`;
+                        } else {
+                            // Show results
+                            document.getElementById('quiz-results').classList.remove('hidden');
+                            
+                            // Calculate and display score
+                            const score = Math.round((correctAnswers / totalQuestions) * 100);
+                            document.getElementById('final-score').textContent = `${score}%`;
+                            
+                            // Update progress bar to 100%
+                            document.getElementById('quiz-progress').style.width = '100%';
+                        }
+                    }
+                    
+                    if (e.target.id === 'retry-btn') {
+                        // Reset quiz
+                        document.getElementById('quiz-results').classList.add('hidden');
+                        
+                        // Reset questions
+                        document.querySelectorAll('.question').forEach((q, index) => {
+                            if (index === 0) {
+                                q.style.display = 'block';
+                            } else {
+                                q.style.display = 'none';
+                            }
+                            
+                            // Reset option buttons
+                            q.querySelectorAll('.option-btn').forEach(btn => {
+                                btn.disabled = false;
+                                btn.classList.remove('correct', 'incorrect');
+                            });
+                            
+                            // Hide feedback
+                            q.querySelector('.feedback').classList.add('hidden');
+                        });
+                        
+                        // Reset tracking variables
+                        currentQuestion = 1;
+                        correctAnswers = 0;
+                        document.getElementById('quiz-progress').style.width = '0%';
+                    }
+                });
+            }
+            
+            function initARSharing() {
+                // AR object selection
+                document.querySelectorAll('.select-object').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const objectId = this.dataset.objectId;
+                        const objectCard = document.querySelector(`.object-card[data-object-id="${objectId}"]`);
+                        const message = objectCard.querySelector('input') ? 
+                            objectCard.querySelector('input').value : 
+                            objectCard.querySelector('.object-message').textContent;
+                        
+                        // Hide object selection, show AR experience
+                        document.querySelector('.objects-selection').style.display = 'none';
+                        document.getElementById('ar-experience').classList.remove('hidden');
+                        
+                        // Initialize AR scene with selected object
+                        initARScene(objectId, message);
+                    });
+                });
+                
+                // Capture button
+                document.getElementById('capture-btn').addEventListener('click', function() {
+                    // In a real implementation, this would capture the AR scene
+                    document.getElementById('ar-experience').classList.add('hidden');
+                    document.getElementById('sharing-options').classList.remove('hidden');
+                    
+                    // Set a placeholder image
+                    document.getElementById('captured-preview').src = "{{ url_for('static', filename='images/ar_capture_placeholder.jpg') }}";
+                });
+                
+                // Change object button
+                document.getElementById('change-object-btn').addEventListener('click', function() {
+                    document.getElementById('ar-experience').classList.add('hidden');
+                    document.querySelector('.objects-selection').style.display = 'block';
+                });
+                
+                // New creation button
+                document.getElementById('new-creation-btn').addEventListener('click', function() {
+                    document.getElementById('sharing-options').classList.add('hidden');
+                    document.querySelector('.objects-selection').style.display = 'block';
+                });
+                
+                // Download button
+                document.getElementById('download-btn').addEventListener('click', function() {
+                    alert('Image downloaded successfully!');
+                });
+                
+                // Share buttons
+                document.querySelectorAll('.share-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        alert(`Sharing to ${this.textContent} (In a real app, this would open a sharing dialog)`);
+                    });
+                });
+                
+                function initARScene(objectId, message) {
+                    const arContainer = document.getElementById('ar-scene-container');
+                    
+                    try {
+                        // Create AR scene
+                        const scene = document.createElement('a-scene');
+                        scene.setAttribute('embedded', '');
+                        scene.setAttribute('arjs', 'sourceType: webcam; debugUIEnabled: false;');
+                        
+                        // Create marker
+                        const marker = document.createElement('a-marker');
+                        marker.setAttribute('preset', 'hiro');
+                        
+                        // Add 3D model based on selected object
+                        const model = document.createElement('a-entity');
+                        model.setAttribute('gltf-model', `../static/models/${objectId}.glb`);
+                        model.setAttribute('scale', '0.5 0.5 0.5');
+                        model.setAttribute('position', '0 0 0');
+                        model.setAttribute('rotation', '0 0 0');
+                        
+                        // Add text for message
+                        const text = document.createElement('a-text');
+                        text.setAttribute('value', message);
+                        text.setAttribute('position', '0 0.6 0');
+                        text.setAttribute('align', 'center');
+                        text.setAttribute('color', '#ffffff');
+                        text.setAttribute('width', '2');
+                        
+                        // Add camera
+                        const camera = document.createElement('a-entity');
+                        camera.setAttribute('camera', '');
+                        
+                        // Assemble the scene
+                        marker.appendChild(model);
+                        marker.appendChild(text);
+                        scene.appendChild(marker);
+                        scene.appendChild(camera);
+                        
+                        // Add scene to container
+                        arContainer.innerHTML = '';
+                        arContainer.appendChild(scene);
+                        
+                        // Add instructions
+                        const instructions = document.createElement('div');
+                        instructions.className = 'ar-instructions';
+                        instructions.innerHTML = `
+                            <p>Point your camera at a Hiro marker to see your AR object.</p>
+                            <div class="marker-image">
+                                <img src="../static/images/hiro-marker.png" alt="Hiro Marker">
+                            </div>
+                        `;
+                        arContainer.appendChild(instructions);
+                    } catch (error) {
+                        console.error('Error creating AR scene:', error);
+                        arContainer.innerHTML = '<div class="error">Error initializing AR experience. Your device may not support AR features.</div>';
+                    }
+                }
+            }
+            
+            function initScenarios() {
+                // Start scenario buttons
+                document.querySelectorAll('.start-scenario').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const scenarioId = this.dataset.scenarioId;
+                        
+                        // Hide scenario selection, show active scenario
+                        document.querySelector('.scenario-selection').style.display = 'none';
+                        document.getElementById('scenario-experience').classList.remove('hidden');
+                        
+                        // Find the scenario data
+                        // Parse the JSON data safely
+                        let scenarioData;
+                        try {
+                            // Check if scenarios exist and provide a fallback if not
+                            let allScenarios = [];
+                            
+                            // Get scenario data from template
+                            const scenarioData = '{{ activity.scenarios|tojson|safe }}';
+                            if (scenarioData) {
+                                allScenarios = JSON.parse(scenarioData);
+                            }
+                            
+                            if (allScenarios.length > 0) {
+                                scenarioData = allScenarios.find(s => s.id === scenarioId);
+                            } else {
+                                // Handle case where scenarios data is missing
+                                console.error('No scenarios data available');
+                                document.getElementById('active-scenario').innerHTML = 
+                                    '<div class="error">Sorry, scenario data is not available.</div>';
+                                return;
+                            }
+                        } catch (error) {
+                            console.error('Error parsing scenario data:', error);
+                            document.getElementById('active-scenario').innerHTML = 
+                                '<div class="error">Sorry, there was an error loading the scenario data.</div>';
+                            return;
+                        }
+                        
+                        // Initialize scenario
+                        loadScenario(scenarioData);
+                    });
+                });
+                
+                function loadScenario(scenarioData) {
+                    try {
+                        const scenarioContainer = document.getElementById('active-scenario');
+                        let currentDecisionPoint = 0;
+                        const totalPoints = scenarioData.decision_points.length;
+                        
+                        // Build the initial scenario view
+                        scenarioContainer.innerHTML = `
+                            <h3>${scenarioData.title}</h3>
+                            <div id="scenario-context">
+                                <p>${scenarioData.description}</p>
+                            </div>
+                            
+                            <div id="character-container">
+                                <!-- In a real implementation, this would show a 3D model -->
+                                <div class="character-placeholder">
+                                    <img src="../static/images/characters/${scenarioData.character.replace('.glb', '.png')}" alt="Character">
+                                </div>
+                            </div>
+                            
+                            <div id="decision-points">
+                                <!-- Decision points will be added here -->
+                            </div>
+                            
+                            <div id="reflection-questions" class="hidden">
+                                <h3>Reflect on Your Experience</h3>
+                                <ul>
+                                    ${scenarioData.reflection_questions.map(q => `<li>${q}</li>`).join('')}
+                                </ul>
+                                <button id="finish-scenario" class="btn primary">Finish</button>
+                            </div>
+                        `;
+                        
+                        // Load first decision point
+                        loadDecisionPoint(scenarioData.decision_points[0]);
+                        
+                        // Handle decision point interactions
+                        scenarioContainer.addEventListener('click', function(e) {
+                            if (e.target.classList.contains('decision-option')) {
+                                // Get selected option index
+                                const optionIndex = parseInt(e.target.dataset.index);
+                                const currentPoint = scenarioData.decision_points[currentDecisionPoint];
+                                
+                                // Show consequence
+                                const decisionDiv = document.getElementById('decision-points');
+                                decisionDiv.innerHTML = `
+                                    <div class="consequence">
+                                        <p>${currentPoint.consequences[optionIndex]}</p>
+                                        <button class="btn primary continue-btn">Continue</button>
+                                    </div>
+                                `;
+                            }
+                            
+                            if (e.target.classList.contains('continue-btn')) {
+                                currentDecisionPoint++;
+                                
+                                if (currentDecisionPoint < totalPoints) {
+                                    // Load next decision point
+                                    loadDecisionPoint(scenarioData.decision_points[currentDecisionPoint]);
+                                } else {
+                                    // Show reflection questions
+                                    document.getElementById('decision-points').classList.add('hidden');
+                                    document.getElementById('reflection-questions').classList.remove('hidden');
+                                }
+                            }
+                            
+                            if (e.target.id === 'finish-scenario') {
+                                // Return to scenario selection
+                                document.getElementById('scenario-experience').classList.add('hidden');
+                                document.querySelector('.scenario-selection').style.display = 'block';
+                                
+                                // Show completion message
+                                alert(scenarioData.completion_message || '{{ activity.completion_message }}');
+                            }
+                        });
+                        
+                        function loadDecisionPoint(decisionPoint) {
+                            const decisionDiv = document.getElementById('decision-points');
+                            decisionDiv.innerHTML = `
+                                <div class="situation">
+                                    <p>${decisionPoint.situation}</p>
+                                </div>
+                                <div class="options">
+                                    <h4>What would you do?</h4>
+                                    ${decisionPoint.options.map((option, index) => 
+                                        `<button class="decision-option" data-index="${index}">${option}</button>`
+                                    ).join('')}
+                                </div>
+                            `;
+                        }
+                    } catch (error) {
+                        console.error('Error loading scenario:', error);
+                        document.getElementById('active-scenario').innerHTML = 
+                            '<div class="error">Sorry, there was an error loading this scenario. Please try again.</div>';
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

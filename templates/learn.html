@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn About Mental Health - Mentally</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+    <!-- Add AOS animation library -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+<body>
+    <div class="animated-background light">
+        <div class="wave wave1"></div>
+        <div class="wave wave2"></div>
+    </div>
+    
+    <header>
+        <div class="container">
+            <h1 class="logo">Mentally</h1>
+            <p class="tagline">Reducing Mental Health Stigma Using Augmented Reality (AR)</p>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/ar_experience">AR Experience</a></li>
+                    <li><a href="/learn" class="active">Learn</a></li>
+                    <li><a href="/simulations">Simulations</a></li>
+                    <li><a href="/activities">Activities</a></li>
+                    <li><a href="/mental_health_content">Resources</a></li>
+                </ul>
+            </nav>
+            <button class="menu-toggle" title="Toggle Menu">
+                <span class="visually-hidden">Menu</span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <section class="page-header gradient-bg">
+        <div class="container">
+            <h2 data-aos="fade-up">Learn About Mental Health</h2>
+            <p data-aos="fade-up" data-aos-delay="200">Explore educational content about various mental health topics with interactive AR visualizations.</p>
+        </div>
+        <div class="wave-divider">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100">
+                <path fill="#ffffff" fill-opacity="1" d="M0,32L48,48C96,64,192,96,288,96C384,96,480,64,576,48C672,32,768,32,864,48C960,64,1056,96,1152,96C1248,96,1344,64,1392,48L1440,32L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+            </svg>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="topics-grid">
+                {% if topics %}
+                    {% for topic_id, topic in topics.items() %}
+                        <div class="topic-card" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                            <h3>{{ topic.title }}</h3>
+                            <p>{{ topic.overview }}</p>
+                            <div class="topic-footer">
+                                <a href="/learn/{{ topic_id }}" class="btn primary pulse">Explore Topic</a>
+                            </div>
+                            <div class="corner-decoration"></div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="error-message" data-aos="fade-up">
+                        <h3>Content Loading Error</h3>
+                        <p>We're having trouble loading the educational topics. Please try refreshing the page or check back later.</p>
+                        <button onclick="location.reload()" class="btn primary">Refresh Page</button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section parallax-bg">
+        <div class="container">
+            <h3 data-aos="fade-up">Why Mental Health Education Matters</h3>
+            <div class="info-columns">
+                <div class="info-column" data-aos="fade-up" data-aos-delay="100">
+                    <div class="info-icon-wrapper">
+                        <img src="{{ url_for('static', filename='images/education-icon.png') }}" alt="Education Icon">
+                    </div>
+                    <h4>Combat Stigma</h4>
+                    <p>Education is one of the most powerful tools for reducing mental health stigma. Understanding the facts helps dispel myths and misconceptions.</p>
+                </div>
+                <div class="info-column" data-aos="fade-up" data-aos-delay="200">
+                    <div class="info-icon-wrapper">
+                        <img src="{{ url_for('static', filename='images/support-icon.png') }}" alt="Support Icon">
+                    </div>
+                    <h4>Support Others</h4>
+                    <p>Learning about mental health helps you better support friends and family members who may be struggling.</p>
+                </div>
+                <div class="info-column" data-aos="fade-up" data-aos-delay="300">
+                    <div class="info-icon-wrapper">
+                        <img src="{{ url_for('static', filename='images/self-care-icon.png') }}" alt="Self-care Icon">
+                    </div>
+                    <h4>Care for Yourself</h4>
+                    <p>Understanding mental health is essential for recognizing your own needs and developing effective self-care strategies.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section glass-effect" data-aos="fade-up">
+        <div class="container">
+            <h3>Experience Mental Health Concepts in AR</h3>
+            <p>Deepen your understanding through immersive AR visualizations</p>
+            <a href="/ar_experience" class="btn primary glow">Try AR Experience</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Mentally</h3>
+                    <p>Reducing Mental Health Stigma Using Augmented Reality (AR)</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/learn">Learn</a></li>
+                        <li><a href="/simulations">Simulations</a></li>
+                        <li><a href="/activities">Activities</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="/mental_health_content">Information</a></li>
+                        <li><a href="/local_resources">Find Local Support</a></li>
+                        <li><a href="/mindfulness">Mindfulness Exercises</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Mentally Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <!-- Add AOS animation library -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        // Initialize AOS animations
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+        
+        // Parallax effect for info section
+        window.addEventListener('scroll', function() {
+            const parallax = document.querySelector('.parallax-bg');
+            if (parallax) {
+                const scrollPosition = window.pageYOffset;
+                parallax.style.backgroundPositionY = (scrollPosition * 0.4) + 'px';
+            }
+        });
+        
+        // Error handling for image loading
+        document.querySelectorAll('.topic-icon img').forEach(img => {
+            img.addEventListener('error', function() {
+                this.src = '{{ url_for("static", filename="images/default-topic-icon.png") }}';
+            });
+        });
+    </script>
+</body>
+</html>

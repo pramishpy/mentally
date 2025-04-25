@@ -1,0 +1,22 @@
+3D Models Directory for Mentally Project
+
+This directory should contain the following .glb model files:
+- anxiety_visualization.glb
+- depression_visualization.glb
+- breaking_stigma.glb
+- mental_health_awareness.glb
+- calming_exercise.glb
+- mood_lifting.glb
+- community_support.glb
+
+For development purposes, you can use placeholder models or create simple models using tools like:
+- Blender (https://www.blender.org/)
+- Microsoft's 3D Builder
+- Online tools like Sketchfab
+
+Models should be optimized for web/mobile viewing with:
+- Low polygon count (ideally under 50k triangles)
+- Compressed textures
+- Total file size under 5MB per model for fast loading
+
+When deploying to production, consider hosting larger models on a CDN for better performance.

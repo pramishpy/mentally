@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Stories - Mentally</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Mentally</h1>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/ar_experience">AR Experience</a></li>
+                    <li><a href="/learn">Learn</a></li>
+                    <li><a href="/simulations">Simulations</a></li>
+                    <li><a href="/activities">Activities</a></li>
+                    <li><a href="/mental_health_content">Resources</a></li>
+                </ul>
+            </nav>
+            <button class="menu-toggle" title="Toggle Menu">
+                <span class="visually-hidden">Menu</span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h2>Personal Mental Health Stories</h2>
+            <p>Real stories from people with lived experience of mental health challenges, shared to build understanding and reduce stigma.</p>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="story-grid">
+                {% for story in stories %}
+                    <div class="story-card">
+                        <div class="story-image">
+                            {% if story.media and story.media|length > 0 %}
+                                <img src="{{ url_for('static', filename='images/' + story.media[0]) }}" alt="{{ story.title }}">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/story_placeholder.jpg') }}" alt="Story placeholder">
+                            {% endif %}
+                        </div>
+                        <div class="story-content">
+                            <h3>{{ story.title }}</h3>
+                            <p class="story-author">{{ story.person }}</p>
+                            <p class="story-summary">{{ story.summary }}</p>
+                            <div class="story-footer">
+                                <a href="/story/{{ story.id }}" class="btn secondary">Read Full Story</a>
+                                {% if story.ar_elements %}
+                                    <span class="ar-badge" title="This story has AR elements">AR</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="share-your-story">
+                <h3>Share Your Story</h3>
+                <p>Your experiences matter and could help others. Would you like to share your mental health journey?</p>
+                <button class="btn primary open-story-form">Share My Story</button>
+            </div>
+
+            <div id="story-form-modal" class="modal hidden">
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <h3>Share Your Mental Health Story</h3>
+                    <form id="story-submission-form">
+                        <div class="form-group">
+                            <label for="name">Name or Pseudonym</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="age">Age (optional)</label>
+                            <input type="number" id="age" name="age" min="13" max="120">
+                        </div>
+                        <div class="form-group">
+                            <label for="title">Story Title</label>
+                            <input type="text" id="title" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="summary">Brief Summary</label>
+                            <textarea id="summary" name="summary" rows="2" maxlength="150" required></textarea>
+                            <span class="hint">150 characters maximum</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="story">Your Story</label>
+                            <textarea id="story" name="story" rows="6" required></textarea>
+                            <span class="hint">Please share your experience in your own words. You can include challenges, coping strategies, and what you've learned.</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Publishing Preferences</label>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="anonymous" name="anonymous">
+                                <label for="anonymous">Publish anonymously</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="review" name="review" checked readonly>
+                                <label for="review">I understand my story will be reviewed before publishing</label>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn secondary close-form">Cancel</button>
+                            <button type="submit" class="btn primary">Submit Story</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <div class="container">
+            <h3>The Power of Shared Stories</h3>
+            <div class="info-columns">
+                <div class="info-column">
+                    <h4>Breaking Isolation</h4>
+                    <p>Hearing others' experiences helps people realize they're not alone in their mental health journey.</p>
+                </div>
+                <div class="info-column">
+                    <h4>Fighting Stigma</h4>
+                    <p>Personal stories humanize mental health conditions and challenge stereotypes and misconceptions.</p>
+                </div>
+                <div class="info-column">
+                    <h4>Hope & Recovery</h4>
+                    <p>Stories of resilience and recovery provide hope and practical insights for those facing similar challenges.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Mentally</h3>
+                    <p>Reducing Mental Health Stigma Using Augmented Reality (AR)</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/learn">Learn</a></li>
+                        <li><a href="/simulations">Simulations</a></li>
+                        <li><a href="/activities">Activities</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="/mental_health_content">Information</a></li>
+                        <li><a href="/local_resources">Find Local Support</a></li>
+                        <li><a href="/mindfulness">Mindfulness Exercises</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Mentally Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('story-form-modal');
+            const openFormBtn = document.querySelector('.open-story-form');
+            const closeForm = document.querySelector('.close-form');
+            const closeModal = document.querySelector('.close-modal');
+            const storyForm = document.getElementById('story-submission-form');
+            
+            // Open form modal
+            openFormBtn.addEventListener('click', function() {
+                modal.classList.remove('hidden');
+            });
+            
+            // Close form modal
+            closeForm.addEventListener('click', function() {
+                modal.classList.add('hidden');
+            });
+            
+            closeModal.addEventListener('click', function() {
+                modal.classList.add('hidden');
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+            
+            // Handle form submission
+            storyForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // In a real app, this would send the data to the server
+                alert('Thank you for sharing your story! It has been submitted for review.');
+                modal.classList.add('hidden');
+                storyForm.reset();
+            });
+        });
+    </script>
+</body>
+</html>

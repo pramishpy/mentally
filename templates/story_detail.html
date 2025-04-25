@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ story.title }} - Personal Stories - Mentally</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- A-Frame for AR -->
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Mentally</h1>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/ar_experience">AR Experience</a></li>
+                    <li><a href="/learn">Learn</a></li>
+                    <li><a href="/simulations">Simulations</a></li>
+                    <li><a href="/activities">Activities</a></li>
+                    <li><a href="/mental_health_content">Resources</a></li>
+                </ul>
+            </nav>
+            <button type="button" class="menu-toggle" title="Toggle Menu">
+                <span class="visually-hidden">Menu</span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <a href="/stories" class="back-link">&larr; Back to Stories</a>
+            <h2>{{ story.title }}</h2>
+            <p class="story-author">{{ story.person }}</p>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="story-detail">
+                <div class="story-media">
+                    {% if story.media and story.media|length > 0 %}
+                        <img src="{{ url_for('static', filename='images/' + story.media[0]) }}" alt="Photo related to {{ story.title }}">
+                    {% endif %}
+                </div>
+                
+                <div class="story-summary">
+                    <blockquote>
+                        {{ story.summary }}
+                    </blockquote>
+                </div>
+                
+                <div class="story-content">
+                    <p>{{ story.content }}</p>
+                </div>
+                
+                {% if story.ar_elements %}
+                    <div class="ar-experience-section">
+                        <h3>Experience this story in AR</h3>
+                        <p>Use augmented reality to deepen your understanding of this personal journey.</p>
+                        
+                        <div class="ar-points">
+                            <h4>Interactive Points</h4>
+                            <div class="ar-points-list">
+                                {% for point in story.ar_elements.interactive_points %}
+                                    <div class="ar-point">
+                                        <button type="button" class="ar-point-btn" data-point="{{ point.title|lower|replace(' ', '_') }}">{{ point.title }}</button>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <button type="button" id="start-ar-story" class="btn primary">Start AR Experience</button>
+                    </div>
+                    
+                    <div id="ar-story-viewer" class="ar-viewer hidden">
+                        <button type="button" class="ar-close-btn" id="close-ar-story">✕</button>
+                        <div id="ar-story-container"></div>
+                        
+                        <div class="ar-instructions">
+                            <p>Move your device to explore the scene. Tap on highlighted points to learn more.</p>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <div class="support-resources">
+                    <h3>Helpful Resources</h3>
+                    <p>If this story resonated with you or you're facing similar challenges, these resources might help:</p>
+                    <ul class="resources-list">
+                        <li><a href="/learn/{{ story.id.split('-')[0] }}">Learn about {{ story.id.split('-')[0] }}</a></li>
+                        <li><a href="/mental_health_content">Mental Health Information</a></li>
+                        <li><a href="/local_resources">Find Local Support</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="story-navigation">
+                <h3>More Stories</h3>
+                <div class="story-nav-buttons">
+                    <a href="/stories" class="btn secondary">View All Stories</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Mentally</h3>
+                    <p>Reducing Mental Health Stigma Using Augmented Reality (AR)</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/learn">Learn</a></li>
+                        <li><a href="/simulations">Simulations</a></li>
+                        <li><a href="/activities">Activities</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="/mental_health_content">Information</a></li>
+                        <li><a href="/local_resources">Find Local Support</a></li>
+                        <li><a href="/mindfulness">Mindfulness Exercises</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Mentally Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if AR elements exist - convert to proper JavaScript boolean
+        // Ensure this is a boolean
+        // Get story ID from the template context
+        const storyId = "{{ story.id }}"; // Make sure story.id is defined in your template context
+
+        if (hasArElements) {
+            // AR Experience functionality
+            const startARBtn = document.getElementById('start-ar-story');
+            const closeARBtn = document.getElementById('close-ar-story');
+            const arViewer = document.getElementById('ar-story-viewer');
+            const arContainer = document.getElementById('ar-story-container');
+            const arPointBtns = document.querySelectorAll('.ar-point-btn');
+
+            let arElements;
+            fetch('/api/ar_elements?story_id=' + storyId)
+                .then(response => response.json())
+                .then(data => {
+                    arElements = data;
+                    console.log(arElements);
+
+                    // Setup AR point buttons
+                    arPointBtns.forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const pointId = this.getAttribute('data-point');
+                            // Find matching point in AR elements
+                            const point = arElements.interactive_points.find(p =>
+                                p.title.toLowerCase().replace(' ', '_') === pointId);
+
+                            if (point) {
+                                alert(`"${point.title}": ${point.content}`);
+                            }
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching AR elements:', error);
+                    arElements = {
+                        character_model: "default_character.glb",
+                        environment: "default_environment.glb",
+                        interactive_points: []
+                    };
+                });
+
+            // Start AR experience
+            startARBtn.addEventListener('click', function() {
+                arViewer.classList.remove('hidden');
+                initializeARScene();
+            });
+            
+            // Close AR experience
+            closeARBtn.addEventListener('click', function() {
+                arViewer.classList.add('hidden');
+                arContainer.innerHTML = '';
+            });
+
+            function initializeARScene() {
+                try {
+                    if (!arElements) {
+                        console.error('AR elements not loaded yet');
+                        return;
+                    }
+
+                    // Create A-Frame scene
+                    const scene = document.createElement('a-scene');
+                    scene.setAttribute('embedded', '');
+                    scene.setAttribute('vr-mode-ui', 'enabled: false');
+                    
+                    // Add environment
+                    const environment = document.createElement('a-entity');
+                    environment.setAttribute('gltf-model', `../static/models/${arElements.environment}`);
+                    environment.setAttribute('position', '0 0 -3');
+                    environment.setAttribute('scale', '1 1 1');
+                    scene.appendChild(environment);
+                    
+                    // Add character
+                    const character = document.createElement('a-entity');
+                    character.setAttribute('gltf-model', `../static/models/${arElements.character_model}`);
+                    character.setAttribute('position', '0 0 -2');
+                    character.setAttribute('scale', '0.5 0.5 0.5');
+                    scene.appendChild(character);
+                    
+                    // Add interactive points
+                    arElements.interactive_points.forEach((point, index) => {
+                        const pointEntity = document.createElement('a-sphere');
+                        pointEntity.setAttribute('color', '#4a6bdf');
+                        pointEntity.setAttribute('radius', '0.1');
+                        pointEntity.setAttribute('position', point.position.join(' '));
+                        pointEntity.setAttribute('class', 'clickable');
+                        pointEntity.setAttribute('animation', 'property: scale; to: 1.2 1.2 1.2; dir: alternate; dur: 1000; loop: true');
+                        
+                        // Text label
+                        const textLabel = document.createElement('a-text');
+                        textLabel.setAttribute('value', point.title);
+                        textLabel.setAttribute('align', 'center');
+                        textLabel.setAttribute('position', `0 0.2 0`);
+                        textLabel.setAttribute('scale', '0.5 0.5 0.5');
+                        pointEntity.appendChild(textLabel);
+                        
+                        // Click event
+                        pointEntity.addEventListener('click', function() {
+                            alert(`"${point.title}": ${point.content}`);
+                        });
+                        
+                        scene.appendChild(pointEntity);
+                    });
+                    
+                    // Add camera
+                    const camera = document.createElement('a-entity');
+                    camera.setAttribute('camera', '');
+                    camera.setAttribute('look-controls', '');
+                    camera.setAttribute('position', '0 1.6 0');
+                    scene.appendChild(camera);
+                    
+                    // Add to container
+                    arContainer.appendChild(scene);
+                    
+                } catch (error) {
+                    console.error('Error initializing AR scene:', error);
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>

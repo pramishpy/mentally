@@ -1,0 +1,697 @@
+/* AR Experience specific styles */
+
+.ar-header {
+    background: linear-gradient(135deg, var(--primary-color), #8a4bdf);
+    color: white;
+    padding: 4rem 0 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.ar-header h2 {
+    color: white;
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    animation: fadeInUp 1s ease-out;
+}
+
+.ar-header p {
+    font-size: 1.2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    opacity: 0.9;
+    animation: fadeInUp 1s ease-out 0.3s both;
+}
+
+/* Experience options selection */
+.experience-options {
+    margin-bottom: 2rem;
+}
+
+.option-cards {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+}
+
+.option-card {
+    flex: 1;
+    max-width: 300px;
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.option-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.option-card.active {
+    border-color: var(--primary-color);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(74, 107, 223, 0.2);
+}
+
+.option-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--light-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: var(--primary-color);
+    transition: all 0.3s ease;
+}
+
+.option-card:hover .option-icon,
+.option-card.active .option-icon {
+    background: var(--primary-color);
+    color: white;
+    transform: scale(1.1);
+}
+
+.option-card h3 {
+    margin-bottom: 0.5rem;
+}
+
+.option-card p {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Input group with animation */
+.input-container {
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.input-group {
+    display: flex;
+    margin: 1.5rem 0;
+    position: relative;
+    z-index: 1;
+}
+
+.input-group input {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background-color: white;
+    border-radius: 50px;
+    font-size: 1rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 5px 20px rgba(74, 107, 223, 0.2);
+    outline: none;
+}
+
+.input-group button {
+    border-radius: 50px;
+    padding: 1rem 1.5rem;
+    margin-left: -2rem;
+    z-index: 2;
+}
+
+/* Pulse animation for input */
+.pulse-dot {
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    z-index: 2;
+    animation: pulse-animation 2s infinite;
+    pointer-events: none;
+}
+
+@keyframes pulse-animation {
+    0% {
+        box-shadow: 0 0 0 0px rgba(74, 107, 223, 0.4);
+    }
+    100% {
+        box-shadow: 0 0 0 20px rgba(74, 107, 223, 0);
+    }
+}
+
+/* Enhanced suggestion buttons */
+.suggestion-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.suggestion-buttons .btn {
+    background-color: rgba(74, 107, 223, 0.1);
+    color: var(--primary-color);
+    border: 1px solid rgba(74, 107, 223, 0.2);
+    transition: all 0.3s ease;
+}
+
+.suggestion-buttons .btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-3px);
+}
+
+/* Enhanced AR viewer */
+.ar-viewer {
+    position: relative;
+    width: 100%;
+    height: 70vh;
+    background-color: #000;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    margin: 2rem auto;
+    z-index: 10;
+}
+
+.ar-viewer.hidden {
+    display: none;
+}
+
+/* Important A-Frame overrides to ensure camera displays properly */
+.ar-viewer a-scene {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 5 !important;
+    display: block !important;
+}
+
+/* Fix for A-Frame embedded mode and canvas */
+.ar-viewer a-scene canvas {
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute !important;
+    object-fit: cover !important;
+}
+
+/* Stop AR button */
+.stop-ar-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 100;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.stop-ar-btn:hover {
+    background-color: rgba(220, 53, 69, 0.8);
+}
+
+/* AR Instructions */
+.ar-instructions {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0,0,0,0.7);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    max-width: 80%;
+    text-align: center;
+    z-index: 100;
+    pointer-events: auto !important; /* Ensure instructions are interactive */
+}
+
+/* Info overlay for AR content */
+.info-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+    opacity: 1;
+    visibility: visible;
+    transition: all 0.3s ease;
+}
+
+.info-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.info-content {
+    background-color: white;
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+}
+
+/* Marker instructions */
+.marker-container {
+    background-color: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 20px 0;
+    text-align: center;
+    pointer-events: auto !important; /* Ensure marker container is interactive */
+}
+
+.marker-image {
+    width: 150px;
+    height: 150px;
+    margin: 10px auto;
+    border: 1px solid #ddd;
+}
+
+.marker-download {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #4a6bdf;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 0.9em;
+    pointer-events: auto !important; /* Force pointer events */
+    position: relative;
+    z-index: 202; /* High z-index to ensure clickability */
+}
+
+/* AR loading and error states */
+.loading-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+    z-index: 10;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.error-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(220, 53, 69, 0.9);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 80%;
+    text-align: center;
+    z-index: 15;
+}
+
+/* Fix for hidden class to ensure it overrides everything */
+.hidden {
+    display: none !important;
+}
+
+/* Enhanced overlay */
+.info-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.info-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.info-overlay:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+}
+
+.info-content {
+    background-color: white;
+    padding: 2.5rem;
+    border-radius: 20px;
+    max-width: 600px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.3s ease 0.1s;
+}
+
+.info-overlay:not(.hidden) .info-content {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.1);
+    color: #555;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+    background: rgba(0, 0, 0, 0.2);
+    color: #000;
+}
+
+.info-content h3 {
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+    font-size: 1.8rem;
+}
+
+/* Reflection field */
+.reflection-field {
+    margin-top: 2rem;
+    border-top: 1px solid #eee;
+    padding-top: 1rem;
+}
+
+.reflection-field textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    resize: vertical;
+    margin-top: 0.5rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+#save-reflection {
+    margin-top: 1rem;
+}
+
+/* Action buttons */
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+}
+
+/* Guided tours section */
+.tours-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+.tour-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.tour-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.tour-preview {
+    position: relative;
+    height: 180px;
+    overflow: hidden;
+}
+
+.tour-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+}
+
+.tour-card:hover .tour-preview img {
+    transform: scale(1.05);
+}
+
+.tour-duration {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+}
+
+.tour-content {
+    padding: 1.5rem;
+}
+
+.tour-content h4 {
+    margin-bottom: 0.5rem;
+}
+
+.tour-content p {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 1.2rem;
+}
+
+/* Tips section */
+.ar-tips {
+    padding: 4rem 0;
+}
+
+.ar-tips h3 {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.tip-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.tip-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.tip-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--light-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: var(--primary-color);
+}
+
+/* Feedback section */
+.feedback-section {
+    text-align: center;
+    padding: 4rem 0;
+    margin: 4rem 0;
+}
+
+.feedback-options {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 2rem 0;
+}
+
+.feedback-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: white;
+    border: none;
+    border-radius: 12px;
+    padding: 1.5rem;
+    min-width: 120px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.feedback-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.feedback-btn.active {
+    border: 2px solid var(--primary-color);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(74, 107, 223, 0.2);
+}
+
+.feedback-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.feedback-form {
+    max-width: 600px;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+}
+
+.feedback-form textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    resize: vertical;
+    font-family: inherit;
+    margin-bottom: 1rem;
+}
+
+.thank-you {
+    color: var(--primary-color);
+    font-weight: 600;
+    padding: 1rem;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .option-cards {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .option-card {
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .input-group {
+        flex-direction: column;
+    }
+    
+    .input-group input, 
+    .input-group button {
+        width: 100%;
+        border-radius: 50px;
+        margin: 0 0 1rem 0;
+    }
+    
+    .ar-viewer {
+        height: 50vh;
+    }
+    
+    .tours-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tips-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .feedback-options {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .feedback-btn {
+        width: 100%;
+        max-width: 300px;
+    }
+}

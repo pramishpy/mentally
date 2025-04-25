@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Educational Modules - Mentally</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Mentally</h1>
+            <p class="tagline">Reducing mental health stigma with the use of AR</p>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/ar_experience">AR Experience</a></li>
+                    <li><a href="/ar_education" class="active">AR Education</a></li>
+                    <li><a href="/learn">Learn</a></li>
+                    <li><a href="/simulations">Simulations</a></li>
+                    <li><a href="/activities">Activities</a></li>
+                    <li><a href="/mental_health_content">Resources</a></li>
+                </ul>
+            </nav>
+            <button class="menu-toggle" title="Toggle Menu">
+                <span class="visually-hidden">Menu</span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h2>AR Educational Modules</h2>
+            <p>Immersive augmented reality experiences designed to reduce mental health stigma through education and empathy-building.</p>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="modules-grid">
+                {% for module in modules %}
+                    <div class="module-card">
+                        <div class="module-icon">
+                            <img src="{{ url_for('static', filename='images/ar_education/' + module.id + '_icon.png') }}" alt="{{ module.title }} icon">
+                        </div>
+                        <div class="module-content">
+                            <h3>{{ module.title }}</h3>
+                            <p>{{ module.description }}</p>
+                            <a href="/ar_education/{{ module.id }}" class="btn primary">Explore Module</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="info-section">
+                <h3>How AR Education Reduces Stigma</h3>
+                <div class="info-columns">
+                    <div class="info-column">
+                        <div class="info-icon">
+                            <img src="{{ url_for('static', filename='images/empathy_icon.png') }}" alt="Empathy icon">
+                        </div>
+                        <h4>Building Empathy</h4>
+                        <p>AR experiences provide a unique perspective into the lived experiences of people with mental health conditions, fostering deeper understanding and empathy.</p>
+                    </div>
+                    <div class="info-column">
+                        <div class="info-icon">
+                            <img src="{{ url_for('static', filename='images/education_icon.png') }}" alt="Education icon">
+                        </div>
+                        <h4>Interactive Learning</h4>
+                        <p>Our AR modules convert abstract concepts into visible, tangible visualizations that make mental health education more engaging and memorable.</p>
+                    </div>
+                    <div class="info-column">
+                        <div class="info-icon">
+                            <img src="{{ url_for('static', filename='images/practice_icon.png') }}" alt="Practice icon">
+                        </div>
+                        <h4>Practice & Application</h4>
+                        <p>AR conversation simulators provide a safe space to practice supportive communication skills and stigma-free language.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Mentally</h3>
+                    <p>Reducing Mental Health Stigma Using Augmented Reality (AR)</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/learn">Learn</a></li>
+                        <li><a href="/simulations">Simulations</a></li>
+                        <li><a href="/activities">Activities</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="/mental_health_content">Information</a></li>
+                        <li><a href="/local_resources">Find Local Support</a></li>
+                        <li><a href="/mindfulness">Mindfulness Exercises</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Mentally Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

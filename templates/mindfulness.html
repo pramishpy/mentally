@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindfulness Exercises - Mentally</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- A-Frame for AR visualizations -->
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Mentally</h1>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/ar_experience">AR Experience</a></li>
+                    <li><a href="/learn">Learn</a></li>
+                    <li><a href="/simulations">Simulations</a></li>
+                    <li><a href="/activities">Activities</a></li>
+                    <li><a href="/mental_health_content">Resources</a></li>
+                </ul>
+            </nav>
+            <button class="menu-toggle" title="Toggle Menu">
+                <span class="visually-hidden">Menu</span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h2>Mindfulness Exercises</h2>
+            <p>Practice mindfulness techniques with AR visualization to support your mental well-being.</p>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="intro-text">
+                <p>Mindfulness practices can help reduce stress, improve focus, and support overall mental health. Each exercise below includes guided instructions and optional AR visualizations to enhance your practice.</p>
+            </div>
+
+            <div class="mindfulness-exercises">
+                {% for exercise in exercises %}
+                    <div class="exercise-card" id="{{ exercise.id }}">
+                        <div class="exercise-header">
+                            <h3>{{ exercise.title }}</h3>
+                            <span class="duration-badge">{{ exercise.duration }}</span>
+                        </div>
+                        
+                        <p>{{ exercise.description }}</p>
+                        
+                        <div class="exercise-content">
+                            <div class="instructions">
+                                <h4>Instructions</h4>
+                                <p>{{ exercise.instructions }}</p>
+                            </div>
+                            
+                            <div class="exercise-actions">
+                                <button class="btn primary start-exercise" data-exercise-id="{{ exercise.id }}">Start Exercise</button>
+                                <button class="btn secondary start-ar-exercise" data-exercise-id="{{ exercise.id }}" data-ar-model="{{ exercise.ar_visualization }}">Try with AR</button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div id="exercise-modal" class="modal hidden">
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <div id="exercise-container">
+                        <!-- Exercise content will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="ar-exercise-modal" class="modal hidden">
+                <div class="modal-content wider">
+                    <span class="close-modal">&times;</span>
+                    <div id="ar-exercise-container">
+                        <!-- AR exercise content will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <div class="container">
+            <h3>Benefits of Mindfulness</h3>
+            <div class="info-columns">
+                <div class="info-column">
+                    <h4>Stress Reduction</h4>
+                    <p>Regular mindfulness practice can lower cortisol levels and help manage stress responses.</p>
+                </div>
+                <div class="info-column">
+                    <h4>Mental Clarity</h4>
+                    <p>Mindfulness helps clear mental clutter and improve focus and concentration.</p>
+                </div>
+                <div class="info-column">
+                    <h4>Emotional Regulation</h4>
+                    <p>Mindfulness practices can help identify and manage difficult emotions more effectively.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Mentally</h3>
+                    <p>Reducing Mental Health Stigma Using Augmented Reality (AR)</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/learn">Learn</a></li>
+                        <li><a href="/simulations">Simulations</a></li>
+                        <li><a href="/activities">Activities</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="/mental_health_content">Information</a></li>
+                        <li><a href="/local_resources">Find Local Support</a></li>
+                        <li><a href="/mindfulness">Mindfulness Exercises</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Mentally Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const exerciseModal = document.getElementById('exercise-modal');
+            const arExerciseModal = document.getElementById('ar-exercise-modal');
+            const exerciseContainer = document.getElementById('exercise-container');
+            const arExerciseContainer = document.getElementById('ar-exercise-container');
+            const closeButtons = document.querySelectorAll('.close-modal');
+            
+            // Start regular exercise
+            document.querySelectorAll('.start-exercise').forEach(button => {
+                button.addEventListener('click', function() {
+                    const exerciseId = this.getAttribute('data-exercise-id');
+                    const exerciseCard = document.getElementById(exerciseId);
+                    const title = exerciseCard.querySelector('h3').textContent;
+                    const instructions = exerciseCard.querySelector('.instructions p').textContent;
+                    
+                    // Populate modal content
+                    exerciseContainer.innerHTML = `
+                        <h3>${title}</h3>
+                        <div class="guided-exercise">
+                            <div class="timer">
+                                <div class="timer-display">05:00</div>
+                                <button class="btn secondary timer-control">Start</button>
+                            </div>
+                            <div class="exercise-instructions">
+                                <p>${instructions}</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Show modal
+                    exerciseModal.classList.remove('hidden');
+                    
+                    // Initialize timer functionality
+                    initTimer();
+                });
+            });
+            
+            // Start AR exercise
+            document.querySelectorAll('.start-ar-exercise').forEach(button => {
+                button.addEventListener('click', function() {
+                    const exerciseId = this.getAttribute('data-exercise-id');
+                    const arModel = this.getAttribute('data-ar-model');
+                    const exerciseCard = document.getElementById(exerciseId);
+                    const title = exerciseCard.querySelector('h3').textContent;
+                    const instructions = exerciseCard.querySelector('.instructions p').textContent;
+                    
+                    // Populate AR modal content
+                    arExerciseContainer.innerHTML = `
+                        <h3>${title} with AR</h3>
+                        <div class="ar-scene-container">
+                            <a-scene embedded style="height: 400px;">
+                                <a-entity 
+                                    position="0 0 -3" 
+                                    gltf-model="../static/models/${arModel}"
+                                    animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear">
+                                </a-entity>
+                                <a-sky color="#ECECEC"></a-sky>
+                                <a-entity camera position="0 1.6 0" look-controls></a-entity>
+                            </a-scene>
+                        </div>
+                        <div class="guided-exercise">
+                            <div class="timer">
+                                <div class="timer-display">05:00</div>
+                                <button class="btn secondary timer-control">Start</button>
+                            </div>
+                            <div class="exercise-instructions">
+                                <p>${instructions}</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Show AR modal
+                    arExerciseModal.classList.remove('hidden');
+                    
+                    // Initialize timer functionality
+                    initTimer();
+                });
+            });
+            
+            // Close modals
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    exerciseModal.classList.add('hidden');
+                    arExerciseModal.classList.add('hidden');
+                    
+                    // Reset content
+                    exerciseContainer.innerHTML = '';
+                    arExerciseContainer.innerHTML = '';
+                });
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === exerciseModal) {
+                    exerciseModal.classList.add('hidden');
+                    exerciseContainer.innerHTML = '';
+                }
+                if (event.target === arExerciseModal) {
+                    arExerciseModal.classList.add('hidden');
+                    arExerciseContainer.innerHTML = '';
+                }
+            });
+            
+            // Timer functionality
+            function initTimer() {
+                const timerDisplay = document.querySelector('.timer-display');
+                const timerControl = document.querySelector('.timer-control');
+                let timeLeft = 300; // 5 minutes in seconds
+                let timerInterval;
+                
+                timerControl.addEventListener('click', function() {
+                    if (this.textContent === 'Start') {
+                        // Start timer
+                        this.textContent = 'Pause';
+                        timerInterval = setInterval(function() {
+                            timeLeft--;
+                            
+                            // Update display
+                            const minutes = Math.floor(timeLeft / 60);
+                            const seconds = timeLeft % 60;
+                            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                            
+                            // Check if timer is finished
+                            if (timeLeft <= 0) {
+                                clearInterval(timerInterval);
+                                timerControl.textContent = 'Restart';
+                                timerDisplay.textContent = 'Complete!';
+                            }
+                        }, 1000);
+                    } else if (this.textContent === 'Pause') {
+                        // Pause timer
+                        clearInterval(timerInterval);
+                        this.textContent = 'Resume';
+                    } else if (this.textContent === 'Resume') {
+                        // Resume timer
+                        this.textContent = 'Pause';
+                        timerInterval = setInterval(function() {
+                            timeLeft--;
+                            
+                            // Update display
+                            const minutes = Math.floor(timeLeft / 60);
+                            const seconds = timeLeft % 60;
+                            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                            
+                            // Check if timer is finished
+                            if (timeLeft <= 0) {
+                                clearInterval(timerInterval);
+                                timerControl.textContent = 'Restart';
+                                timerDisplay.textContent = 'Complete!';
+                            }
+                        }, 1000);
+                    } else if (this.textContent === 'Restart') {
+                        // Restart timer
+                        timeLeft = 300;
+                        timerDisplay.textContent = '05:00';
+                        this.textContent = 'Start';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

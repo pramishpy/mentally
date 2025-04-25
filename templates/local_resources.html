@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Mental Health Resources - Mentally</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Add Leaflet for maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Mentally</h1>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/ar_experience">AR Experience</a></li>
+                    <li><a href="/learn">Learn</a></li>
+                    <li><a href="/simulations">Simulations</a></li>
+                    <li><a href="/activities">Activities</a></li>
+                    <li><a href="/mental_health_content">Resources</a></li>
+                </ul>
+            </nav>
+            <button class="menu-toggle" title="Toggle Menu">
+                <span class="visually-hidden">Menu</span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h2>Find Local Mental Health Resources</h2>
+            <p>Connect with mental health services and support in your area.</p>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="location-search">
+                <h3>Search for Resources Near You</h3>
+                <form id="location-form" method="GET" action="/local_resources">
+                    <div class="search-container">
+                        <input type="text" id="location" name="location" placeholder="Enter city, state, or zip code" value="{{ resources.location if resources.location else '' }}">
+                        <button type="submit" class="btn primary">Search</button>
+                    </div>
+                    <p class="hint">Examples: "New York, NY", "90210", "Los Angeles"</p>
+                </form>
+            </div>
+
+            {% if resources %}
+                <div class="resources-results">
+                    {% if resources.resources %}
+                        <h3>Resources in {{ resources.location }}</h3>
+                        
+                        <div class="map-container">
+                            <div id="resource-map" class="resource-map"></div>
+                        </div>
+                        
+                        <div class="resources-list">
+                            {% for resource in resources.resources %}
+                                <div class="resource-card" data-lat="{{ resource.coordinates[0] }}" data-lng="{{ resource.coordinates[1] }}">
+                                    <h4>{{ resource.name }}</h4>
+                                    <p class="resource-description">{{ resource.description }}</p>
+                                    
+                                    <div class="resource-details">
+                                        <div class="detail-item">
+                                            <strong>Address:</strong>
+                                            <p>{{ resource.address }}</p>
+                                        </div>
+                                        
+                                        <div class="detail-item">
+                                            <strong>Contact:</strong>
+                                            <p>{{ resource.phone }}</p>
+                                        </div>
+                                        
+                                        
+                                    <div class="resource-actions">
+                                        <a href="{{ resource.website }}" target="_blank" class="btn secondary">Visit Website</a>
+                                        <button class="btn-icon save-resource" data-resource="{{ resource.name }}">
+                                            <span class="visually-hidden">Save</span>
+                                            <svg width="20" height="20" viewBox="0 0 24 24">
+                                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% elif resources.message %}
+                        <div class="no-results">
+                            <h3>{{ resources.message }}</h3>
+                            
+                            <div class="general-resources">
+                                <h4>General Resources</h4>
+                                <div class="resources-grid">
+                                    {% for resource in resources.general_resources %}
+                                        <div class="resource-card">
+                                            <h4>{{ resource.name }}</h4>
+                                            <p>{{ resource.description }}</p>
+                                            <div class="detail-item">
+                                                <strong>Contact:</strong>
+                                                <p>{{ resource.contact }}</p>
+                                            </div>
+                                            <div class="resource-actions">
+                                                <a href="{{ resource.website }}" target="_blank" class="btn secondary">Visit Website</a>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="featured-resources">
+                    <h3>Featured Mental Health Resources</h3>
+                    <p>Search above for local resources or explore these national services:</p>
+                    
+                    <div class="resources-grid">
+                        {% for resource in resources.resources %}
+                            <div class="resource-card">
+                                <h4>{{ resource.name }}</h4>
+                                <p>{{ resource.description }}</p>
+                                <div class="detail-item">
+                                    <strong>Contact:</strong>
+                                    <p>{{ resource.contact }}</p>
+                                </div>
+                                <div class="resource-actions">
+                                    <a href="{{ resource.website }}" target="_blank" class="btn secondary">Visit Website</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            
+            <div class="ar-resource-finder">
+                <h3>Try Our AR Resource Finder</h3>
+                <p>Experience our augmented reality resource finder that overlays mental health resources onto your real-world view.</p>
+                <div class="ar-preview">
+                    <img src="{{ url_for('static', filename='images/ar_resource_preview.jpg') }}" alt="AR Resource Finder Preview">
+                </div>
+                <a href="/ar_resources" class="btn primary">Launch AR Resource Finder</a>
+            </div>
+            
+            <div class="disclaimer-box">
+                <h4>Important Information</h4>
+                <p>If you are experiencing a mental health emergency, please call 988 (Suicide & Crisis Lifeline) or go to your nearest emergency room.</p>
+                <p>The resources provided are for informational purposes only and do not constitute an endorsement or recommendation of any specific provider.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Mentally</h3>
+                    <p>Reducing Mental Health Stigma Using Augmented Reality (AR)</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/learn">Learn</a></li>
+                        <li><a href="/simulations">Simulations</a></li>
+                        <li><a href="/activities">Activities</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="/mental_health_content">Information</a></li>
+                        <li><a href="/local_resources">Find Local Support</a></li>
+                        <li><a href="/mindfulness">Mindfulness Exercises</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Mentally Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize map if resources are available with coordinates
+            const resourceCards = document.querySelectorAll('.resource-card[data-lat]');
+            
+            if (resourceCards.length > 0) {
+                try {
+                    // Initialize map
+                    const firstResource = resourceCards[0];
+                    const centerLat = parseFloat(firstResource.getAttribute('data-lat'));
+                    const centerLng = parseFloat(firstResource.getAttribute('data-lng'));
+                    
+                    if (!isNaN(centerLat) && !isNaN(centerLng)) {
+                        const map = L.map('resource-map').setView([centerLat, centerLng], 13);
+                        
+                        // Add OpenStreetMap tiles
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        }).addTo(map);
+                        
+                        // Add markers for each resource
+                        resourceCards.forEach(card => {
+                            const lat = parseFloat(card.getAttribute('data-lat'));
+                            const lng = parseFloat(card.getAttribute('data-lng'));
+                            
+                            if (!isNaN(lat) && !isNaN(lng)) {
+                                const name = card.querySelector('h4').textContent;
+                                
+                                const marker = L.marker([lat, lng]).addTo(map);
+                                marker.bindPopup(`<b>${name}</b><br>Click for details`);
+                                
+                                // Highlight card when marker is clicked
+                                marker.on('click', function() {
+                                    // Scroll to card
+                                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    // Add highlight class
+                                    card.classList.add('highlighted');
+                                    // Remove highlight after a few seconds
+                                    setTimeout(() => {
+                                        card.classList.remove('highlighted');
+                                    }, 3000);
+                                });
+                            }
+                        });
+                    } else {
+                        throw new Error('Invalid coordinates');
+                    }
+                } catch (error) {
+                    console.error('Error initializing map:', error);
+                    const mapElement = document.getElementById('resource-map');
+                    if (mapElement) {
+                        mapElement.innerHTML = '<p class="error">Error loading map. Please try again later.</p>';
+                    }
+                }
+            }
+            
+            // Save resource functionality
+            const saveButtons = document.querySelectorAll('.save-resource');
+            saveButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const resourceName = this.getAttribute('data-resource');
+                    alert(`Resource "${resourceName}" saved to your profile. You can access your saved resources in your account.`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
