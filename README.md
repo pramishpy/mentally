@@ -15,7 +15,7 @@ Mentally is a web application that uses Augmented Reality (AR) to reduce mental 
 Either clone the repository from GitHub:
 
 ```bash
-git clone https://github.com/yourusername/mentally.git
+git clone https://github.com/pramishpy/mentally.git
 cd mentally
 ```
 
@@ -84,10 +84,6 @@ To use the AR features:
 - **AR not working**: Ensure your browser supports WebGL and has camera permissions
 - **Module not found errors**: Make sure you've installed all dependencies from requirements.txt
 - **Server not starting**: Check for error messages in the terminal, you might have another service using port 5000
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Credits
 
