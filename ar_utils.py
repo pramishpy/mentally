@@ -96,6 +96,10 @@ class ARProcessor:
             "description": experience["descriptions"][model_index],
             "info": experience["info"]
         }
+        # Note for frontend: The AR experience page should render the live camera
+        # feed as the background for the AR content. This is typically handled
+        # by the frontend AR rendering engine (e.g., WebXR for web, 
+        # ARKit/ARCore for native apps).
         
         # Add stigma reduction content if available
         if "stigma_reduction" in experience:

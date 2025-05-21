@@ -1,44 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentally - Reducing Mental Health Stigma</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Add AOS animation library -->
-    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-    <!-- Add custom animations CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
-</head>
-<body>
-    <div class="animated-background">
-        <div class="wave wave1"></div>
-        <div class="wave wave2"></div>
-    </div>
+{% extends "base.html" %}
 
-    <header>
-        <div class="container">
-            <h1 class="logo">Mentally</h1>
-            <p class="tagline">Reducing Mental Health Stigma Using Augmented Reality (AR)</p>
-            <nav>
-                <ul>
-                    <li><a href="/" class="active">Home</a></li>
-                    <li><a href="/ar_experience">AR Experience</a></li>
-                    <li><a href="/learn">Learn</a></li>
-                    <li><a href="/simulations">Simulations</a></li>
-                    <li><a href="/activities">Activities</a></li>
-                    <li><a href="/mental_health_content">Resources</a></li>
-                </ul>
-            </nav>
-            <button class="menu-toggle" title="Toggle Menu">
-                <span class="visually-hidden">Menu</span>
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-        </div>
-    </header>
+{% block title %}Mentally - Reducing Mental Health Stigma{% endblock %}
 
+{% block content %}
     <section class="hero">
         <div class="container">
             <div class="hero-content" data-aos="fade-up">
@@ -133,60 +97,20 @@
             </div>
         </div>
     </section>
+{% endblock %}
 
-    <footer>
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-column">
-                    <h3>Mentally</h3>
-                    <p>Reducing Mental Health Stigma Using Augmented Reality (AR)</p>
-                </div>
-                <div class="footer-column">
-                    <h3>Quick Links</h3>
-                    <ul>
-                        <li><a href="/">Home</a></li>
-                        <li><a href="/learn">Learn</a></li>
-                        <li><a href="/simulations">Simulations</a></li>
-                        <li><a href="/activities">Activities</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Resources</h3>
-                    <ul>
-                        <li><a href="/mental_health_content">Information</a></li>
-                        <li><a href="/local_resources">Find Local Support</a></li>
-                        <li><a href="/mindfulness">Mindfulness Exercises</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 Mentally Project. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-    <!-- Add AOS animation library -->
-    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-    <script>
-        // Initialize AOS animations
-        AOS.init({
-            duration: 800,
-            easing: 'ease-in-out',
-            once: true
-        });
-
-        // Hero section parallax effect
-        document.addEventListener('mousemove', function(e) {
-            const hero = document.querySelector('.hero');
-            const mouseX = e.clientX / window.innerWidth;
-            const mouseY = e.clientY / window.innerHeight;
-            const depth1 = `${50 - mouseX * 10}% ${50 - mouseY * 10}%`;
-            const depth2 = `${50 - mouseX * 20}% ${50 - mouseY * 20}%`;
-            
-            document.documentElement.style.setProperty('--mouse-x', mouseX);
-            document.documentElement.style.setProperty('--mouse-y', mouseY);
-        });
-    </script>
-</body>
-</html>
+{% block extra_js %}
+<script>
+    // Specific JavaScript for index.html can go here if needed.
+    // For example, if the parallax effect is ONLY for the hero section on the index page:
+    // document.addEventListener('mousemove', function(e) {
+    //     const hero = document.querySelector('.hero');
+    //     if (hero) { // Ensure hero element exists
+    //         const mouseX = e.clientX / window.innerWidth;
+    //         const mouseY = e.clientY / window.innerHeight;
+    //         document.documentElement.style.setProperty('--mouse-x', mouseX);
+    //         document.documentElement.style.setProperty('--mouse-y', mouseY);
+    //     }
+    // });
+</script>
+{% endblock %}

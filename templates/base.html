@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mentally - Reducing Mental Health Stigma{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Add AOS animation library -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <!-- Add custom animations CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="animated-background">
+        <div class="wave wave1"></div>
+        <div class="wave wave2"></div>
+    </div>
+
+    <header>
+        <div class="container">
+            <!-- Ensure the logo is linked to the home page -->
+            <a href="{{ url_for('home') }}" class="logo-link">
+                <h1 class="logo">Mentally</h1>
+            </a>
+            <p class="tagline">Reducing Mental Health Stigma Using Augmented Reality (AR)</p>
+            <nav>
+                <ul>
+                    <!-- Note: The 'active' class might need dynamic handling based on the current page -->
+                    <li><a href="{{ url_for('home') }}" class="{{ 'active' if request.endpoint == 'home' else '' }}">Home</a></li>
+                    <li><a href="{{ url_for('ar_experience') }}" class="{{ 'active' if request.endpoint == 'ar_experience' else '' }}">AR Experience</a></li>
+                    <li><a href="{{ url_for('learn') }}" class="{{ 'active' if request.endpoint == 'learn' else '' }}">Learn</a></li>
+                    <li><a href="{{ url_for('simulations') }}" class="{{ 'active' if request.endpoint == 'simulations' else '' }}">Simulations</a></li>
+                    <li><a href="{{ url_for('activities') }}" class="{{ 'active' if request.endpoint == 'activities' else '' }}">Activities</a></li>
+                    <li><a href="{{ url_for('mental_health_content') }}" class="{{ 'active' if request.endpoint == 'mental_health_content' else '' }}">Resources</a></li>
+                    <!-- Add other common navigation links here if needed, e.g., Empathy Bridge -->
+                </ul>
+            </nav>
+            <button class="menu-toggle" title="Toggle Menu">
+                <span class="visually-hidden">Menu</span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    {% block content %}{% endblock %}
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Mentally</h3>
+                    <p>Reducing Mental Health Stigma Using Augmented Reality (AR)</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="{{ url_for('home') }}">Home</a></li>
+                        <li><a href="{{ url_for('learn') }}">Learn</a></li>
+                        <li><a href="{{ url_for('simulations') }}">Simulations</a></li>
+                        <li><a href="{{ url_for('activities') }}">Activities</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="{{ url_for('mental_health_content') }}">Information</a></li>
+                        <li><a href="{{ url_for('local_resources') }}">Find Local Support</a></li>
+                        <li><a href="{{ url_for('mindfulness') }}">Mindfulness Exercises</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Mentally Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <!-- Add AOS animation library -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        // Initialize AOS animations
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        // Hero section parallax effect (if this is intended for all pages, otherwise move to specific template)
+        // This might be better in index.html's specific script block if only for the hero there.
+        // For now, keeping it here as it was in the original index.html script section.
+        document.addEventListener('mousemove', function(e) {
+            const hero = document.querySelector('.hero'); // This will only work if a .hero element is on the page
+            if (hero) {
+                const mouseX = e.clientX / window.innerWidth;
+                const mouseY = e.clientY / window.innerHeight;
+                // const depth1 = `${50 - mouseX * 10}% ${50 - mouseY * 10}%`; // These variables were not used
+                // const depth2 = `${50 - mouseX * 20}% ${50 - mouseY * 20}%`; // These variables were not used
+                
+                document.documentElement.style.setProperty('--mouse-x', mouseX);
+                document.documentElement.style.setProperty('--mouse-y', mouseY);
+            }
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

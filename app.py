@@ -79,15 +79,68 @@ def activities():
 
 @app.route('/activity/<activity_id>')
 def activity_detail(activity_id):
-    activity = activity_manager.get_activity(activity_id)
-    # Check if activity exists
-    if activity is None:
+    original_activity_data = activity_manager.get_activity(activity_id)
+
+    if original_activity_data is None:
         return render_template('error.html', message="Activity not found"), 404
+
+    # Initialize a new dictionary to ensure clean data for the template
+    activity = {}
+
+    # Helper to safely get a value from the original data (dict or object)
+    def _get_value(source, key, default=None):
+        if isinstance(source, dict):
+            return source.get(key, default)
+        # For objects, ensure getattr doesn't raise if key is missing but default is provided
+        try:
+            return getattr(source, key)
+        except AttributeError:
+            return default
+
+    activity['id'] = _get_value(original_activity_data, 'id', activity_id)
+    # Provide a more specific default title if possible, fallback later if still generic
+    default_title = f"Activity: {activity_id.replace('-', ' ').title()}" if activity_id else "Activity Details"
+    activity['title'] = _get_value(original_activity_data, 'title', default_title)
+    activity['type'] = _get_value(original_activity_data, 'type')
+    activity['description'] = _get_value(original_activity_data, 'description', "")
+
+    # Process scenarios
+    raw_scenarios = _get_value(original_activity_data, 'scenarios')
+    processed_scenarios = []
+    if isinstance(raw_scenarios, list):
+        for i, scen_item in enumerate(raw_scenarios):
+            if isinstance(scen_item, dict):
+                # Ensure essential keys for each scenario
+                scenario_dict = {
+                    'id': scen_item.get('id', f"scenario_{i}"), # Default ID if missing
+                    'title': scen_item.get('title', "Untitled Scenario"),
+                    'description': scen_item.get('description', ""),
+                    'steps': scen_item.get('steps', []) # Default to empty list for steps
+                }
+                # Ensure 'steps' is indeed a list
+                if not isinstance(scenario_dict['steps'], list):
+                    scenario_dict['steps'] = []
+                processed_scenarios.append(scenario_dict)
+            # Optionally: else: log or handle malformed scenario item (e.g., not a dict)
+    activity['scenarios'] = processed_scenarios
+
+    # Handle conversation_starter specific fields
+    if activity['type'] == 'conversation_starter' or activity_id == 'conversation-starter':
+        raw_prompts = _get_value(original_activity_data, 'prompts')
+        if isinstance(raw_prompts, list):
+            # Assuming prompts are a list of strings or simple dicts not needing deep processing
+            activity['prompts'] = raw_prompts
+        else:
+            activity['prompts'] = []
+        
+        # Ensure a specific title for conversation starters if current one is generic
+        if activity['title'] == default_title or not activity['title'] or activity['title'] == "Activity Details":
+            activity['title'] = "Conversation Starters"
     
-    # Ensure all expected properties exist to prevent template errors
-    if activity.get('type') == 'interactive-scenarios' and 'scenarios' not in activity:
-        activity['scenarios'] = []
-    
+    # Final fallback for title if it's still the very generic "Activity Details"
+    if activity['title'] == "Activity Details" and activity_id:
+         activity['title'] = f"Activity: {activity_id.replace('-', ' ').title()}"
+
     return render_template('activity_detail.html', activity=activity)
 
 @app.route('/scavenger_hunt')

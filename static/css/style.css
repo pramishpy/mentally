@@ -2106,3 +2106,41 @@ select:focus {
     margin-left: auto;
     margin-right: auto;
 }
+
+/* Footer styles */
+.footer {
+    background-color: var(--dark-color);
+    color: white;
+    padding: 2rem 0;
+}
+.footer .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.footer .container .logo {
+    display: flex;
+    align-items: center;
+}
+.footer .container .logo img {
+    width: 50px; /* Adjust size as needed */
+    margin-right: 10px;
+}
+.footer .container .logo h1 {
+    font-size: 1.5rem;
+    color: white;
+    margin: 0;
+}
+.footer .container .logo h1 span {
+    color: var(--primary-color);
+}
+
+.logo-link {
+    text-decoration: none; /* Removes underline */
+    color: inherit;       /* Makes it use the parent's text color */
+    display: inline-block; /* Adjust as needed for layout */
+}
+.logo-link:hover {
+    /* Optional: add hover effect */
+    text-decoration: none; /* Or underline, etc. */
+}
